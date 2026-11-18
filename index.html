@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>MA-3 / MA-4 Carburetor Overhaul — 3D Service Guide</title>
+<style>
+:root{
+  --bg:#eef2f6; --panel:#ffffff; --ink:#18212b; --muted:#4b5866; --line:#d5dce4;
+  --accent:#1d4ed8; --accent-ink:#ffffff; --hl:#c2410c; --hl-soft:#fff1e6;
+  --ok:#15803d; --ok-soft:#e8f6ec; --bad:#b91c1c; --bad-soft:#fdecec;
+  --warn-soft:#fff7e0; --warn-line:#e0a800; --note-soft:#eaf1ff;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+  font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid #f59e0b;outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.app{display:grid;grid-template-rows:auto 1fr;height:100vh}
+header{display:flex;align-items:center;gap:14px;padding:10px 16px;background:#0f2a4a;color:#fff;flex-wrap:wrap}
+header h1{font-size:17px;margin:0;font-weight:650;letter-spacing:.2px}
+header .sub{font-size:12.5px;color:#c9d6e6}
+header .spacer{flex:1}
+.hbtn{background:#1e3f68;color:#fff;border:1px solid #3d6394;border-radius:8px;padding:6px 11px;font-size:13.5px}
+.hbtn:hover{background:#28507f}
+main{display:grid;grid-template-columns:1fr 430px;min-height:0}
+#viewer{position:relative;min-height:0;background:linear-gradient(#f9fbfd,#dfe6ee)}
+#viewer canvas{display:block;width:100%;height:100%;touch-action:none}
+.vtools{position:absolute;top:10px;left:10px;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 20px)}
+.vbtn{background:rgba(255,255,255,.94);border:1px solid var(--line);color:var(--ink);border-radius:8px;
+  padding:5px 10px;font-size:13px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.vbtn:hover{border-color:#9fb0c3}
+.vbtn[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.hint{position:absolute;bottom:10px;left:10px;font-size:12px;color:var(--muted);background:rgba(255,255,255,.85);
+  padding:4px 8px;border-radius:6px}
+#labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.plabel{position:absolute;transform:translate(-50%,-100%);background:var(--hl);color:#fff;font-size:12px;font-weight:600;
+  padding:2px 7px;border-radius:5px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.plabel::after{content:"";position:absolute;left:50%;bottom:-5px;margin-left:-5px;border:5px solid transparent;border-bottom:0;border-top-color:var(--hl)}
+#tip{position:absolute;pointer-events:none;background:#18212b;color:#fff;font-size:12.5px;padding:3px 8px;border-radius:5px;display:none;white-space:nowrap}
+#partcard{position:absolute;right:10px;bottom:10px;width:290px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+  padding:12px 14px;box-shadow:0 6px 18px rgba(15,42,74,.15);display:none;font-size:13.5px}
+#partcard h3{margin:0 0 4px;font-size:15px}
+#partcard dl{margin:6px 0 0;display:grid;grid-template-columns:auto 1fr;gap:3px 10px}
+#partcard dt{color:var(--muted)} #partcard dd{margin:0}
+#partcard .x{position:absolute;top:6px;right:8px;border:0;background:none;font-size:18px;color:var(--muted)}
+aside{background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+[role=tablist]{display:flex;border-bottom:1px solid var(--line)}
+[role=tab]{flex:1;background:none;border:0;border-bottom:3px solid transparent;padding:11px 6px;font-weight:600;color:var(--muted)}
+[role=tab][aria-selected=true]{color:var(--accent);border-bottom-color:var(--accent)}
+.pane{flex:1;overflow:auto;padding:14px 16px 18px;min-height:0}
+.pane[hidden]{display:none}
+.secnav{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.chip{border:1px solid var(--line);background:#f6f8fb;border-radius:999px;padding:3px 10px;font-size:12.5px;color:var(--ink)}
+.chip[aria-current=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+.progress{height:6px;background:#e3e9f0;border-radius:4px;overflow:hidden;margin:4px 0 12px}
+.progress>div{height:100%;background:var(--accent);width:0;transition:width .3s}
+.stepmeta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted)}
+.card{border:1px solid var(--line);border-radius:var(--radius);padding:14px 15px;background:#fff}
+.card h2{font-size:18px;margin:2px 0 8px;line-height:1.3}
+.mref{display:inline-block;font-size:12px;font-weight:700;color:var(--accent);background:var(--note-soft);border-radius:5px;padding:1px 7px}
+.secname{font-size:12px;color:var(--muted);margin-left:6px}
+.card p{margin:0 0 10px}
+.box{border-left:4px solid;border-radius:6px;padding:8px 10px;margin:10px 0 0;font-size:14px}
+.box.warn{background:var(--warn-soft);border-color:var(--warn-line)}
+.box.note{background:var(--note-soft);border-color:var(--accent)}
+.box.tq{background:var(--hl-soft);border-color:var(--hl)}
+.box b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.parts{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.pchip{border:1px solid #f3c7a7;background:var(--hl-soft);color:#7c2d12;border-radius:6px;padding:2px 8px;font-size:12.5px}
+.pchip:hover{border-color:var(--hl)}
+.navrow{display:flex;gap:8px;margin-top:14px}
+.btn{border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:8px;padding:8px 14px;font-weight:600}
+.btn.ghost{background:#fff;color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.grow{flex:1}
+table.t{border-collapse:collapse;width:100%;font-size:13px;margin-top:8px}
+table.t th,table.t td{border:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:top}
+table.t th{background:#f1f4f8}
+.plist h3{font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:14px 0 6px}
+.plist .grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.pbtn{text-align:left;border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 7px;font-size:12.5px}
+.pbtn:hover{border-color:#9fb0c3}
+.pbtn[aria-pressed=true]{border-color:var(--hl);background:var(--hl-soft)}
+.pbtn .n{display:inline-block;min-width:26px;font-weight:700;color:var(--hl)}
+input[type=range]{width:100%}
+.q h2{font-size:17px}
+.opts{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.opt{text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:9px 11px}
+.opt:hover{border-color:#9fb0c3}
+.opt[aria-checked=true]{border-color:var(--accent);background:var(--note-soft)}
+.opt.correct{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.fb{margin-top:10px;padding:9px 11px;border-radius:8px;font-size:14px}
+.fb.ok{background:var(--ok-soft);color:#14532d}.fb.no{background:var(--bad-soft);color:#7f1d1d}
+.score{font-size:40px;font-weight:750;color:var(--accent);margin:6px 0}
+.rev{border-top:1px solid var(--line);padding:8px 0;font-size:13.5px}
+.rev .y{color:var(--bad)} .rev .c{color:var(--ok)}
+.mode{display:grid;gap:8px;margin:12px 0}
+.mode button{text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px}
+.mode button:hover{border-color:var(--accent)}
+.mode b{display:block}
+dialog{border:0;border-radius:12px;padding:0;max-width:640px;width:calc(100% - 30px);box-shadow:0 20px 50px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(15,25,40,.45)}
+dialog .dh{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+dialog .dh h2{margin:0;font-size:16px;flex:1}
+dialog .db{padding:12px 16px 16px;max-height:70vh;overflow:auto}
+.loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:14px}
+@media (max-width:900px){
+  .app{height:auto}
+  main{grid-template-columns:1fr}
+  #viewer{height:58vh}
+  aside{border-left:0;border-top:1px solid var(--line)}
+  .pane{overflow:visible}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}
+</script>
+</head>
+<body>
+<div class="app">
+<header>
+  <div>
+    <h1>MA-3 / MA-4 Carburetor Overhaul — 3D Service Guide</h1>
+    <div class="sub">Precision Airmotive FSM-OH1 · Models MA3A, MA3PA, MA3SPA, MA4SPA</div>
+  </div>
+  <div class="spacer"></div>
+  <button class="hbtn" id="btnTorque">Torque table</button>
+  <button class="hbtn" id="btnTools">Special tools</button>
+  <button class="hbtn" id="btnHelp">How to use</button>
+</header>
+<main>
+  <section id="viewer" aria-label="3D carburetor model viewer">
+    <div class="loading" id="loading">Loading 3D model…</div>
+    <div id="labels" aria-hidden="true"></div>
+    <div id="tip" aria-hidden="true"></div>
+    <div class="vtools" role="toolbar" aria-label="View controls">
+      <button class="vbtn" id="vLeft" aria-label="Rotate view left">⟲ Rotate</button>
+      <button class="vbtn" id="vRight" aria-label="Rotate view right">Rotate ⟳</button>
+      <button class="vbtn" id="vUp" aria-label="Tilt view up">Tilt ▲</button>
+      <button class="vbtn" id="vDown" aria-label="Tilt view down">Tilt ▼</button>
+      <button class="vbtn" id="vIn" aria-label="Zoom in">Zoom +</button>
+      <button class="vbtn" id="vOut" aria-label="Zoom out">Zoom −</button>
+      <button class="vbtn" id="vReset">Reset view</button>
+      <button class="vbtn" id="vXray" aria-pressed="false">X-ray castings</button>
+      <button class="vbtn" id="vLabels" aria-pressed="true">Labels</button>
+      <button class="vbtn" id="vFocus" aria-pressed="true">Auto-focus</button>
+    </div>
+    <div class="hint" id="hint">Drag to orbit · scroll to zoom · right-drag to pan · click a part to identify it</div>
+    <div id="partcard" role="region" aria-label="Selected part" aria-live="polite">
+      <button class="x" id="pcClose" aria-label="Close part details">×</button>
+      <div id="pcBody"></div>
+    </div>
+  </section>
+  <aside>
+    <div role="tablist" aria-label="Modes">
+      <button role="tab" id="tab-guide" aria-controls="pane-guide" aria-selected="true">Guide</button>
+      <button role="tab" id="tab-explore" aria-controls="pane-explore" aria-selected="false" tabindex="-1">Explore parts</button>
+      <button role="tab" id="tab-test" aria-controls="pane-test" aria-selected="false" tabindex="-1">Test</button>
+    </div>
+    <div class="pane" id="pane-guide" role="tabpanel" aria-labelledby="tab-guide">
+      <nav class="secnav" id="secnav" aria-label="Manual sections"></nav>
+      <div class="stepmeta"><span id="stepCount"></span><span>← → keys move between steps</span></div>
+      <div class="progress" aria-hidden="true"><div id="prog"></div></div>
+      <article class="card" id="stepCard" aria-live="polite"></article>
+      <div class="navrow">
+        <button class="btn ghost" id="prev">← Previous</button>
+        <button class="btn ghost" id="replay" title="Replay this step's animation">Replay</button>
+        <button class="btn grow" id="next">Next →</button>
+      </div>
+    </div>
+    <div class="pane" id="pane-explore" role="tabpanel" aria-labelledby="tab-explore" hidden>
+      <label for="explode"><b>Exploded view</b> <span id="explodeVal">0%</span></label>
+      <input type="range" id="explode" min="0" max="100" value="60">
+      <p style="font-size:13.5px;color:var(--muted);margin:8px 0 0">Select a part below or click it in the model. Numbers match the manual's exploded view (pages 8–9). Parts marked ♻ are always replaced at overhaul.</p>
+      <div class="plist" id="plist"></div>
+    </div>
+    <div class="pane" id="pane-test" role="tabpanel" aria-labelledby="tab-test" hidden>
+      <div id="testBody"></div>
+    </div>
+  </aside>
+</main>
+</div>
+<div id="live" class="sr-only" aria-live="polite"></div>
+
+<dialog id="dlg" aria-labelledby="dlgTitle">
+  <div class="dh"><h2 id="dlgTitle"></h2><button class="btn ghost" id="dlgClose">Close</button></div>
+  <div class="db" id="dlgBody"></div>
+</dialog>
+
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+
+/* =====================================================================
+   DATA — parts, steps, tables (from Precision Airmotive FSM-OH1)
+   ===================================================================== */
+const PARTS = {
+  1:{n:'Tab (safety) washers — bowl cover screws',g:'tb',rep:false},
+  2:{n:'Bowl cover screws',g:'tb',tq:'35–45 in-lb'},
+  3:{n:'Float shaft cotter pin',g:'tb'},
+  4:{n:'Float shaft',g:'tb',rep:true,wear:'Min. worn dia. .092"'},
+  5:{n:'Float',g:'tb',wear:'Lever pivot .100"; adjustment tab wear spot = .100" dia.'},
+  6:{n:'Float valve retraction clip',g:'tb'},
+  7:{n:'Float valve',g:'tb',rep:true},
+  8:{n:'Bowl gasket (throttle body to bowl)',g:'tb',rep:true},
+  9:{n:'Pump link cotter pins',g:'tb'},
+  10:{n:'Accelerating pump link',g:'tb',wear:'Min. worn dia. .122"'},
+  11:{n:'Accelerating pump plunger assembly',g:'tb',rep:true},
+  12:{n:'Accelerator pump lever screw',g:'tb',tq:'8–11 in-lb'},
+  13:{n:'Accelerating pump lever',g:'tb',wear:'Lever holes max. .132"'},
+  14:{n:'Throttle opening spring',g:'tb'},
+  15:{n:'Pump packing retainer washer',g:'tb',rep:true},
+  16:{n:'Pump stem packing',g:'tb',rep:true},
+  17:{n:'Mixture control clamp screw',g:'tb',tq:'Table II: 15–20 in-lb (step 40 text says 20–28)'},
+  18:{n:'Mixture control safety washer',g:'tb'},
+  19:{n:'Mixture control lever',g:'tb'},
+  20:{n:'Lock wire loop',g:'tb'},
+  21:{n:'Mixture control spring',g:'tb'},
+  22:{n:'Thrust washer',g:'tb'},
+  23:{n:'Mixture control packing',g:'tb',rep:true},
+  24:{n:'Mixture control (metering) valve',g:'tb',wear:'Top min. .215"; bottom min. .2480"'},
+  25:{n:'Horseshoe washer',g:'tb'},
+  26:{n:'Mixture valve gasket',g:'tb',rep:true},
+  27:{n:'Float valve seat',g:'tb',rep:true,tq:'10–12 ft-lb'},
+  28:{n:'Float valve seat gasket',g:'tb',rep:true},
+  29:{n:'Throttle lever cotter pin',g:'tb'},
+  30:{n:'Throttle lever retaining nut',g:'tb',tq:'20–60 in-lb'},
+  31:{n:'Throttle lever',g:'tb'},
+  32:{n:'Throttle valve screws',g:'tb',tq:'10–15 in-lb'},
+  33:{n:'Throttle valve (fly)',g:'tb'},
+  34:{n:'Throttle shaft',g:'tb',wear:'Min. worn dia. .3085"'},
+  35:{n:'Throttle adjusting (stop) screw',g:'tb'},
+  36:{n:'Throttle adjusting screw spring',g:'tb'},
+  37:{n:'Idle adjusting needle',g:'tb'},
+  38:{n:'Idle needle spring',g:'tb'},
+  39:{n:'Idle needle retainer',g:'tb',rep:true},
+  42:{n:'Vent screen',g:'tb'},
+  43:{n:'Venturi',g:'tb'},
+  44:{n:'Throttle shaft bushings',g:'tb',rep:true,wear:'O.D. .3750"; I.D. max. .3135"'},
+  45:{n:'Economizer jet',g:'tb'},
+  46:{n:'Fuel inlet strainer assembly',g:'tb',tq:'10–12 ft-lb'},
+  47:{n:'Fuel inlet gasket',g:'tb',rep:true},
+  48:{n:'Idle tube',g:'bw',tq:'3–5 in-lb'},
+  49:{n:'Bowl drain plug',g:'bw',tq:'25–30 in-lb'},
+  50:{n:'Nozzle (main discharge)',g:'bw',tq:'45–60 in-lb'},
+  51:{n:'Nozzle safety washer',g:'bw'},
+  52:{n:'Nozzle / power jet gasket',g:'bw',rep:true},
+  53:{n:'Pump discharge check valve assembly',g:'bw',tq:'50–70 in-lb'},
+  54:{n:'Discharge valve safety washer',g:'bw'},
+  55:{n:'Discharge valve gasket',g:'bw',rep:true},
+  56:{n:'Pump inlet retainer screws',g:'bw',tq:'14–18 in-lb'},
+  57:{n:'Pump inlet safety washers',g:'bw'},
+  58:{n:'Pump inlet retainer flange',g:'bw'},
+  59:{n:'Pump inlet strainer housing',g:'bw'},
+  60:{n:'Pump inlet gasket',g:'bw',rep:true},
+  61:{n:'Pump inlet screen',g:'bw'},
+  62:{n:'Pump inlet check valve assembly',g:'bw',tq:'8–12 in-lb'},
+  63:{n:'Float bracket screws',g:'tb',tq:'8–11 in-lb'},
+  64:{n:'Float bracket',g:'tb',wear:'Shaft hole max. .100"'},
+  65:{n:'Warning label',g:'bw'},
+  66:{n:'Idle drill plug',g:'tb',tq:'12–16 in-lb + threadlock'},
+  TB:{n:'Throttle body casting',g:'tb',fixed:true,wear:'Mixture hole .222"; pump hole .225"; bushing holes .3775"; stop pad wear ≤ .010" deep'},
+  BW:{n:'Fuel bowl casting',g:'bw',fixed:true,wear:'Mixture sleeve .2500"; pump cylinder max. .630"'},
+  PDT:{n:'Accelerator pump discharge tube',g:'bw',fixed:true},
+};
+const num = r => /^\d+$/.test(String(r)) ? `(${r})` : '';
+const pname = r => `${num(r)} ${PARTS[r].n}`.trim();
+
+const S = (o)=>o;
+const STEPS = [
+ S({sec:'Overview',m:'Intro',t:'Before you start',d:'This guide follows Precision Airmotive service manual FSM-OH1 for the MA3A, MA3PA, MA3SPA and MA4SPA. The models are similar enough that one procedure covers all four. The MA3A has no accelerating pump circuit (example: A10-3103-1 on the Lycoming O-235-C1), so skip the pump steps on that model. Numbers in parentheses match the exploded view on manual pages 8–9.',note:'The 3D model is a composite teaching model, like the manual\'s exploded view: every part is shown, but not always in its exact position or shape.',warn:'Use only Precision-authorized parts. Unauthorized parts void all warranties (SB MSA-5, SIL 10-21-92). Failure to follow these instructions may result in adverse carburetor performance and engine operation.',hl:['TB','BW']}),
+ // DISASSEMBLY
+ S({sec:'Disassembly',m:'1',t:'Remove bowl cover screws',d:'Bend the tab washers (1) flat and remove the four bowl cover screws (2).',rm:[1,2],note:'Older models may use safety wire and cross-drilled screws instead of tab washers.'}),
+ S({m:'2',t:'Separate the castings',d:'Tap the casting lightly with a soft-faced hammer to loosen it, then pull the throttle body and bowl apart.',sep:true,tools:'Soft-faced hammer',warn:'Lift carefully — do not damage the float.',hl:['TB',5]}),
+ S({sec:'Throttle body',m:'3',t:'Remove the float',d:'Remove the float shaft cotter pin (3), float shaft (4), float (5), retraction clip (6) and float valve (7).',rm:[3,4,5,6,7]}),
+ S({m:'4',t:'Discard the bowl gasket',d:'Remove and discard the throttle body-to-bowl gasket (8).',rm:[8]}),
+ S({m:'5',t:'Remove the accelerating pump',d:'Remove the pump link cotter pins (9), pump link (10) and pump plunger assembly (11). Note which hole in the pump lever (13) the link was in.',rm:[9,10,11],note:'The lever hole sets the pump stroke (see steps 44–45). Reinstall the link in the same hole.'}),
+ S({m:'6',t:'Remove pump lever and opening spring',d:'Remove the accelerator pump lever screw (12), lever (13) and throttle opening spring (14).',rm:[12,13,14]}),
+ S({m:'7',t:'Remove the pump packing',d:'Remove the pump packing washer (15) and packing (16) with a pointed tool or small screwdriver.',rm:[15,16],tools:'Pointed tool or small screwdriver'}),
+ S({m:'8',t:'Remove mixture control clamp screw',d:'Remove the mixture control clamp screw (17) and safety washer (18).',rm:[17,18]}),
+ S({m:'9',t:'Remove the mixture control lever stack',d:'Remove the mixture control lever (19), lock wire loop (20), spring (21), thrust washer (22) and packing (23).',rm:[19,20,21,22,23]}),
+ S({m:'10',t:'Remove the mixture control valve',d:'Remove the mixture control valve (24), horseshoe washer (25) and gasket (26).',rm:[24,25,26]}),
+ S({m:'11',t:'Remove the float valve seat',d:'Remove the float valve seat (27) and gasket (28) using tool M-104 or a large screwdriver (Figure 1).',rm:[27,28],tools:'M-104 float valve seat remover'}),
+ S({m:'12',t:'Remove the throttle lever',d:'Make note of the throttle lever position before removal. Then remove the throttle lever cotter pin (29), nut (30) and lever (31).',rm:[29,30,31],warn:'Record the lever angle — it goes back at the same angle in step 42.'}),
+ S({m:'13',t:'Remove throttle valve and shaft',d:'Remove the throttle valve screws (32) and throttle valve (33), then slide out the throttle shaft (34).',rm:[32,33,34]}),
+ S({m:'14',t:'Remove the throttle adjusting screw',d:'Remove the throttle adjusting screw (35) and spring (36).',rm:[35,36]}),
+ S({m:'15',t:'Remove the idle adjusting needle',d:'Remove the idle adjusting needle (37), spring (38) and retainer (39).',rm:[37,38,39],note:'Some models do not use retainer (39). Check the parts list for the correct configuration.'}),
+ S({m:'16',t:'Venturi — only if service is needed',d:'The venturi (43) seldom needs service. If necessary, press it out from the throttle valve side using extractor M-120 (Figure 2).',rm:[43],tools:'M-120 venturi extractor'}),
+ S({m:'17',t:'Remove throttle shaft bushings',d:'Remove the throttle shaft bushings (44) using tool M-122 or any standard bushing removal tool (Figures 3 and 4).',rm:[44],tools:'M-122 bushing remover, M-12 socket extension, M-13 handle'}),
+ S({m:'18',t:'Remove economizer jet, vent screen, idle drill plug',d:'Remove the economizer jet (45) if used, vent screen (42) if used, and idle drill plug (66) if used. Heating may ease removal of the idle drill plug.',rm:[45,42,66],warn:'If a lead ball is used in place of the idle drill plug, DO NOT REMOVE it.'}),
+ S({m:'19',t:'Remove fuel inlet and float bracket',d:'Remove the fuel inlet strainer assembly (46) and gasket (47). Remove the float bracket screws (63) and bracket (64).',rm:[46,47,63,64]}),
+ S({sec:'Fuel bowl',m:'20',t:'Remove idle tube and drain plug',d:'Remove the idle tube (48) and drain plug (49).',rm:[48,49]}),
+ S({m:'21',t:'Remove the nozzle',d:'Remove the nozzle (50), safety washer (51) and nozzle gasket (52) with the 1/2" nozzle wrench (Figure 5).',rm:[50,51,52],tools:'M-7 nozzle wrench, M-12 extension, M-13 handle',warn:'The nozzle gasket sometimes stays in the casting when the nozzle comes out. Make sure it is removed.'}),
+ S({m:'22',t:'Remove pump discharge check valve',d:'Remove the pump discharge check valve assembly (53), safety washer (54) and gasket (55).',rm:[53,54,55],warn:'Do not disassemble the pump discharge valve (53).'}),
+ S({m:'23',t:'Remove the pump inlet assembly',d:'Remove the pump inlet retainer screws (56), safety washers (57), retainer flange (58), strainer housing (59), gasket (60), screen (61) and inlet check valve assembly (62).',rm:[56,57,58,59,60,61,62],hl:['PDT'],note:'The pump discharge tube seldom needs service. If it is damaged or loose, pull it carefully out of its casting counterbore and discard it.'}),
+ // CLEANING & INSPECTION
+ S({sec:'Clean & inspect',m:'24',t:'Clean metal parts',d:'Soak, rinse and blow out parts using a recommended carburetor cleaner and the cleaner manufacturer\'s procedure.',warn:'Only metal parts go in carburetor cleaner. Never expose non-metal parts (float, gaskets, packing, pump leather) to it.',hl:['TB','BW']}),
+ S({m:'25',t:'Inspect passages and orifices',d:'Carburetor passages, channels and orifices are very small and hard to see with the naked eye. Use an otoscope or other magnifier to inspect them.',warn:'Do not clean passages in castings or calibrated parts (nozzle, idle tube, etc.) with wire or small drills. Compressed air, carburetor cleaner and a small soft-bristle brush work well.',hl:[50,48,'TB','BW']}),
+ S({m:'26',t:'Parts always replaced',d:'Always replace these during overhaul: all gaskets; seals and packing; throttle shaft bushings; retainers; float valve and seat assembly; accelerator pump; float shaft.',note:'Replace the fuel inlet strainer assembly if the screen is broken anywhere or cannot be satisfactorily cleaned.',hl:'replace'}),
+ S({m:'27',t:'Inspect for wear (Table I)',d:'Normal aircraft-quality inspection determines whether parts are reusable. Abnormal wear, cracks, warping or damage are cause for rejection, as is wear beyond the limits in Table I.',table:'wear',note:'Late-model aircraft have soft engine mounts, which create more vibration and different wear patterns. Inspect carefully.',hl:[34,44,24,4,13,10,64]}),
+ // ASSEMBLY — THROTTLE BODY
+ S({sec:'Throttle body assembly',m:'28',t:'Install throttle shaft bushings',d:'Lightly coat the bushings with Loctite RC-680. Place a bushing (44) on the M-86 driver and tap it into place; repeat on the opposite side (Figure 6). Cure in place 2–4 hours. Heat up to 110°F may be used to speed curing.',in:[44],tools:'M-86 bushing driver',note:'Repeated rebushing of older models with steel bushings may have enlarged the bore. In that case, make sure the loose bushings stay in location.'}),
+ S({m:'29',t:'Line ream the bushings',d:'Line ream the bushings with reamer M-108 (Figure 7).',hl:[44],tools:'M-108 bushing reamer, tap wrench'}),
+ S({m:'30',t:'Install pump stem packing',d:'Place packing pilot M-123A on the bottom side of the throttle body. Slip the packing (16) into the cavity on the top side, place the retainer (15) over it and stake it in place with punch M-123. Remove the pilot.',in:[16,15],tools:'M-123 stake punch, M-123A pilot'}),
+ S({m:'31',t:'Install the venturi',d:'Install the venturi (43) with tool M-83. Line up the notch in the side of the venturi with the nozzle, with the legs engaged in the grooves in the throttle bore.',in:[43],tools:'M-83 venturi assembling tool'}),
+ S({m:'32',t:'Install economizer jet and vent screen',d:'Install the economizer jet (45), if used, then the vent screen (42), if used.',in:[45,42],warn:'Do not damage or burr the economizer jet. A burr changes fuel flow.'}),
+ S({m:'33',t:'Install the idle drill plug',d:'Install the idle drill plug (66) with Loctite 222 or an equivalent mild threadlock.',in:[66],tq:'12–16 in-lb'}),
+ S({m:'34',t:'Install throttle shaft and valve',d:'Install the throttle shaft (34), throttle valve (33) and screws (32). Run the screws in lightly, rotate the shaft closed and tap the valve with the screwdriver blade to seat it in the bore. Hold the valve closed and tighten the screws.',in:[34,33,32],tq:'Throttle valve screws (32): 10–15 in-lb'}),
+ S({m:'35',t:'Clinch the throttle valve screws',d:'Safety the throttle valve screws with clincher M-109 (Figure 8). When installed correctly, the shaft rotates freely from fully closed to wide open.',hl:[32,34],tools:'M-109 throttle valve bolt clincher',note:'Some carburetors limit the valve to about 15° from fully open. This is normal and part of the full-throttle requirement. DO NOT CHANGE.'}),
+ S({m:'36',t:'Install throttle adjusting screw',d:'Install the throttle adjusting screw (35) and spring (36).',in:[36,35]}),
+ S({m:'37',t:'Install the idle adjusting needle',d:'Install the retainer (39), spring (38) and idle needle (37). Initial setting: 1-1/2 to 2 turns out from the seat.',in:[39,38,37],note:'Some models do not use retainer (39).'}),
+ S({m:'38',t:'Prepare and insert the mixture valve',d:'Place the horseshoe washer (25) in its groove on the mixture control valve (24). Place washer (26) over the valve head and insert the valve into the casting from the bottom.',in:[24,25,26]}),
+ S({m:'39',t:'Install the mixture lever stack',d:'Slide the packing (23), washer (22) and spring (21) over the valve head. Put the tip of the lock wire loop (20) into its hole in the valve head. Align the lever (19) with the wire loop and push down to compress the spring.',in:[23,22,21,20,19],warn:'The loop of the lock wire must face toward the valve.'}),
+ S({m:'40',t:'Install the clamp screw',d:'Install the clamp screw (17) through the safety washer (18), lever (19) and lock wire (20). Bend the safety tab washer to secure it.',in:[18,17],tq:'Step 40 text: 20–28 in-lb · Table II: 15–20 in-lb',note:'The manual disagrees with itself here. Step 40 gives 20–28 in-lb, but Table II lists 15–20 in-lb for the mixture control lever screw (20–28 in-lb is the throttle lever clamp value). Confirm against current Precision data.'}),
+ S({m:'41',t:'Install the float bracket',d:'Install the float bracket (64) with screws (63).',in:[64,63],tq:'8–11 in-lb',warn:'Replace screw (63) if its nylon locking insert is missing or ineffective.'}),
+ S({m:'42',t:'Install pump lever and throttle lever',d:'Slide the throttle opening spring (14), if used, over the shaft end and insert its end through the hole in the casting web. Install the pump lever (13) with screw (12). Safety the screw by passing the spring end through the cross-drilled screw and bending it over (use safety wire if there is no spring). Place the throttle lever (31) at the angle noted at disassembly, install nut (30) and the cotter pin (29), and bend the pin.',in:[14,13,12,31,30,29],tq:'Pump lever screw (12): 8–11 in-lb · Throttle lever nut (30): 20–60 in-lb',note:'If the throttle shaft has no lever locknut retaining feature, safety wire the throttle lever as shown in Figure 9.'}),
+ S({m:'43',t:'Install the accelerating pump',d:'Insert the pump (11) carefully through the packing and install the pump link (10) and cotter pins (9).',in:[11,10,9]}),
+ S({m:'44–45',t:'Pump lever hole selection',d:'The pump lever has three holes for the upper end of the pump link. No. 1 (lower hole) gives the shortest stroke. No. 2 (middle hole) gives a medium supply. No. 3 (outer hole, about midway in height) gives the longest stroke and maximum accelerating fuel — the normal position (Fig. C, page 2).',hl:[13,10]}),
+ S({m:'46–48',t:'Collapsing-type pump plunger',d:'Some pumps have a collapsing feature to prolong the stroke (Figure 10). Hold a spring seat against each end of the spring and slide the plunger-and-stem assembly through it. Slide the plunger rod over the stem so its hole lines up with the slot, compress the spring and insert the locating pin, then release. Press the rod to make sure the stem slides freely. If the pump leather expanding spring was removed, reinstall it carefully under the leather.',hl:[11]}),
+ S({m:'49',t:'Install the fuel inlet strainer',d:'Install the fuel inlet fitting-strainer assembly (46) and gasket (47).',in:[47,46],tq:'10–12 ft-lb'}),
+ S({m:'50',t:'Install the float valve seat',d:'Install the float valve seat (27) and gasket (28) with tool M-104 (Figure 11).',in:[28,27],tq:'10–12 ft-lb',tools:'M-104'}),
+ S({m:'51–52',t:'Install the bowl gasket',d:'From here on, take care not to damage the float. Place the throttle body mounting flange down and install a new throttle body-to-bowl gasket (8).',in:[8]}),
+ S({m:'53–54',t:'Assemble float valve and clip',xr:true,d:'Place the retractor clip (6) on the float valve (7) (Figure 12), then set the valve and clip on the float (Figure 13). Center the valve on the float adjustment tab.',in:[6,7],note:'The clip should not hold the valve tight against the float lever. Allow about .005" clearance.'}),
+ S({m:'55–56',t:'Install the float',xr:true,d:'Place the float, valve and clip into the float bracket (64) with the valve (7) in the seat (27) (Figure 15). Insert the float shaft (4) through the bracket and float hinge, safety it with cotter pin (3), and bend the pin ends all the way back.',in:[5,4,3]}),
+ S({m:'57–58',t:'Check travel and set float level',xr:true,d:'Make sure the float shaft turns freely and the float and valve move freely between fully open and fully closed — about 1/2" of travel at the outer end of the float. Set the float to 7/32" between float and gasket, measured near the outer end of each float (Figure 14). If needed, bend the float lever adjustment tab over the valve.',hl:[5,8],tq:'Float level: 7/32" · Travel: about 1/2"',note:'A small screwdriver bent 30° about 1/4" from its tip is useful for setting the float.'}),
+ S({m:'59–61',t:'Verify both pontoons',xr:true,d:'Both float pontoons must be the same height above the gasket. Check with gauge M-510 (Figure 16); the drill-rod gauge should pass freely around both float sections. To shift the float sideways, loosen the bracket screws (63), move the bracket slightly and retighten. Set the throttle body aside in a clean area.',hl:[5,63,64],tools:'M-510 float clearance gage',warn:'DO NOT apply pressure to the valve and seat while bending the tab.'}),
+ S({m:'62',t:'No compressed air on the float',d:'Do not blow on or into the carburetor assembly with compressed air — it can damage the float.',hl:[5],warn:'Failure to follow this may result in adverse carburetor performance and engine operation.'}),
+ // BOWL ASSEMBLY
+ S({sec:'Fuel bowl assembly',m:'63',t:'Install the idle tube',d:'Install the idle tube (48) in the casting without damaging the tube.',in:[48],tq:'3–5 in-lb'}),
+ S({m:'64–65',t:'Install pump discharge check valve',d:'Install the pump discharge check valve assembly (53) with gasket (55) and safety washer (54). Bend tabs to safety.',in:[55,54,53],tq:'50–70 in-lb',warn:'Do not disassemble the pump discharge valve. It is factory preset; if it has been disassembled it must be replaced.'}),
+ S({m:'66',t:'Install the pump inlet assembly',d:'Install the inlet check valve assembly (62), inlet screen (61), gasket (60), housing (59) and flange (58), then secure with screws (56) and safety washers (57). Bend tabs to secure.',in:[62,61,60,59,58,57,56],tq:'Check valve (62): 8–12 in-lb · Screws (56): 14–18 in-lb',note:'Install the flange (58) with its chamfered side toward the casting.'}),
+ S({m:'67',t:'Install the drain plug',d:'Install the drain plug (49) with a small amount of thread lube.',in:[49],tq:'25–30 in-lb',warn:'Make sure no thread lube can get in ahead of the plug.'}),
+ S({m:'68–69',t:'Install the nozzle',d:'Place the power jet gasket (52) on the shoulder of the power jet at the base of the nozzle. Insert the nozzle through the safety washer (51) and install it firmly into the bowl (Figure 17). Bend ALL tabs of washer (51).',in:[52,51,50],tq:'Nozzle: 45–60 in-lb (Table II)',note:'Install the nozzle with the bowl inverted so the power jet gasket cannot fall into the well and block the power jet.'}),
+ S({m:'70–76',t:'Pump discharge tube — only if replaced',d:'If the tube must be replaced: roughen about 1/2" of the tube end lengthwise (not around) with #320 emery cloth. Clean tube and port with Loctite safety solvent (swab the port with a clean pipe cleaner, wipe the tube with clean tissue). Apply Locquic Primer T or N to both and let it dry 2–5 min. Brush RC-680 on about 1/2" of the tube, starting about 1/16" from the end. Insert with a rotating motion using locating tool M-134 and let it cure.',hl:['PDT'],tools:'M-133 torque tool, M-134 locating tool',tq:'After full cure the joint must hold 48 in-oz without moving (Figure 19)',warn:'Do NOT blow with compressed air after applying safety solvent — moisture and oil in the air recontaminate the surfaces. DO NOT let RC-680 enter the tube.',note:'Primer T: join within 4 min, fixtures in 5 min, full cure 6 hr. Primer N: join within 10 min, fixtures in 15–30 min, full cure 12 hr. Parts can be repositioned for up to one minute.'}),
+ // FINAL
+ S({sec:'Final assembly',m:'77',t:'Join throttle body and bowl',xr:true,fc:['TB','BW'],d:'Carefully join the castings. Insert the pump plunger into its cavity in the bowl, guide the mixture metering valve (24) into its seat, and make sure the pump discharge tube sits inside the venturi center ring. Install bowl cover screws (2) with safety washers (1).',sep:false,in:[1,2],tq:'35–45 in-lb',warn:'Protect the pump leather. Bend up at least two tabs on every safety washer.'}),
+ S({m:'78',t:'Install the warning label',d:'Clean the side of the carburetor body with acetone or an equivalent degreaser and let it dry completely. Peel the backing off the warning label (65) and apply it.',hl:[65]}),
+ // TEST
+ S({sec:'Test procedure',m:'79–80 A–D',t:'Float valve and seat test',xr:true,fc:['TB','BW',49],d:'Connect the fuel inlet to a 0.4 psi fuel supply. Remove the drain plug and connect a fitting, rubber hose and vertical glass sight tube beside the carburetor (Figure 20). Hold 0.4 psi for at least 15 minutes, then raise it to 6.0 psi and hold at least 5 minutes after the level stabilizes. A slight rise in level is normal.',rm:[49],fx:'sight',hl:[49,7,27],tq:'0.4 psi ≥ 15 min → 6.0 psi ≥ 5 min after stable',warn:'If fuel rises to the parting surface or runs out of the nozzle, separate the castings and clean or replace the float valve and seat. Never change the float level to correct flooding or change fuel level.',note:'A properly overhauled carburetor should be equal to new. Final adjustments are made when it is installed on the engine.'}),
+ S({m:'80 E–F',t:'Accelerating pump test',xr:true,fc:['TB','BW'],d:'With fuel supplied, stroke the throttle lever several times to fill the pump and passages. Close the throttle, open it fully and hold it for a few seconds. A good pump gives a solid stream from the discharge tube that gradually dies away as the plunger spring reaches its limit.',fx:'pump',hl:[31,11,'PDT'],warn:'DO NOT stand directly over the carburetor flange — fuel will be directed into your face.',note:'A weak stream, or air coming out, means the pump plunger, discharge check valve or inlet check valve is not working. Disassemble and repair.'}),
+ S({m:'80 G',t:'Drain and secure',d:'Remove the sight tube fixture and drain the fuel. Operate the pump to clear fuel from the cylinder and passages. Reinstall and safety the drain plug.',in:[49]}),
+ S({sec:'Storage',m:'81',t:'Preservative treatment',d:'If the carburetor goes into storage after overhaul, remove the drain plug and flush the carburetor internally with soluble corrosion-preventive oil, MIL-C-4339. Drain the surplus; enough oil clings to the parts to protect them in storage. Replace the drain plug.',hl:[49,'BW']}),
+];
+
+const TOOLS = [
+ ['M-7','Nozzle wrench 1/2" (Snap-On SF-161)'],['M-12','Socket extension'],['M-13','Socket extension handle'],
+ ['M-83','Venturi assembling tool'],['M-86','Throttle shaft bushing driver'],['M-104','Float valve seat remover'],
+ ['M-108','Throttle shaft bushing reamer'],['M-109','Throttle valve bolt clincher'],['M-120','Venturi extractor'],
+ ['M-122','Throttle shaft bushing remover'],['M-123','Pump stem packing stake punch'],['M-123A','Pump stem packing stake pilot'],
+ ['M-133','Torque tool for pump discharge tube'],['M-134','Locating tool for pump discharge tube'],['M-510','Float clearance gage']];
+const TORQUE = [
+ ['Screw — throttle valve','10–15 in-lb'],['Screw — mixture control lever','15–20 in-lb'],['Screw — throttle lever clamp','20–28 in-lb'],
+ ['Screw — pump inlet strainer housing','14–18 in-lb'],['Screw — float bracket','8–11 in-lb'],['Screw — idle drill plug','12–16 in-lb + threadlock'],
+ ['Screw — pump lever pin','8–11 in-lb'],['Screw — throttle body to bowl','35–45 in-lb'],['Valve assy. — pump inlet','8–12 in-lb'],
+ ['Valve assy. — pump discharge','50–70 in-lb'],['Nozzle','45–60 in-lb'],['Nut — throttle lever','20–60 in-lb'],
+ ['Fuel inlet and strainer assy.','10–12 ft-lb'],['Plug — bowl drain','25–30 in-lb'],['Idle tube','3–5 in-lb'],['Float valve seat','10–12 ft-lb']];
+const WEAR = [
+ ['T-Body','Mixture control hole in body','.222'],['24','Mixture control valve (top)','.215'],['T-Body','Accelerator pump hole in T-body','.225'],
+ ['24','Mixture control valve (bottom)','.2480'],['Bowl','Mixture control sleeve','.2500'],['64','Float shaft bracket','.100'],
+ ['4','Float shaft','.092'],['5','Float lever pivot','.100'],['T-Body','Throttle shaft bushing holes','.3775'],
+ ['44','Throttle shaft bushing O.D.','.3750'],['44','Throttle shaft bushing I.D.','.3135'],['34','Throttle shaft','.3085'],
+ ['13','Accelerator pump lever holes','.132'],['10','Accelerator pump link','.122'],['5','Float adjustment tab','wear spot = .100 dia.'],
+ ['Bowl','Accelerator pump cylinder','.630'],['T-Body','Throttle stop pad on T-body','wear spot = .010 deep']];
+const tableHTML = (head, rows)=>`<table class="t"><thead><tr>${head.map(h=>`<th scope="col">${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+const wearTable = ()=>tableHTML(['Index','Description','Permissible worn dim.'],WEAR)+`<p style="font-size:12.5px;color:var(--muted);margin:6px 0 0">Permissible worn clearances between mating parts are listed in manual Table I (page 7).</p>`;
+
+/* ===== derive removal / install steps for each part ===== */
+{let sec='';STEPS.forEach(s=>{if(s.sec)sec=s.sec; s.secName=sec;});}
+for(const k in PARTS){PARTS[k].rmStep=null;PARTS[k].inStep=null;}
+STEPS.forEach(s=>{ if(s.secName==='Test procedure') return; (s.rm||[]).forEach(r=>{if(PARTS[r].rmStep==null)PARTS[r].rmStep=s.m}); (s.in||[]).forEach(r=>{PARTS[r].inStep=s.m});});
+
+/* =====================================================================
+   3D SCENE
+   ===================================================================== */
+const viewer = document.getElementById('viewer');
+const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setClearColor(0x000000,0);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+renderer.domElement.setAttribute('role','img');
+renderer.domElement.setAttribute('aria-label','Interactive 3D model of the MA-3/MA-4 carburetor. The current step and highlighted parts are described in the side panel.');
+viewer.prepend(renderer.domElement);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 200);
+const HOME = {pos:new THREE.Vector3(7.5,4.5,9.5), tgt:new THREE.Vector3(0,0.2,0)};
+camera.position.copy(HOME.pos);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.copy(HOME.tgt);
+controls.enableDamping = true;
+controls.minDistance = 2.5; controls.maxDistance = 30;
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb9c3cf, 0.9));
+const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+sun.position.set(6,12,7); sun.castShadow = true;
+sun.shadow.mapSize.set(2048,2048);
+Object.assign(sun.shadow.camera,{left:-9,right:9,top:9,bottom:-9,near:1,far:40});
+scene.add(sun);
+const fill = new THREE.DirectionalLight(0xdfe9ff, 0.5); fill.position.set(-8,4,-6); scene.add(fill);
+
+const ground = new THREE.Mesh(new THREE.CircleGeometry(14,64), new THREE.MeshStandardMaterial({color:0xdde3ea,roughness:1}));
+ground.rotation.x = -Math.PI/2; ground.position.y = -5.7; ground.receiveShadow = true; scene.add(ground);
+const grid = new THREE.GridHelper(28,28,0xc4ccd6,0xd2d9e1); grid.position.y = -5.69; scene.add(grid);
+
+/* ----- materials ----- */
+const MATS = {
+  cast:()=>new THREE.MeshStandardMaterial({color:0xc6cad0,metalness:.35,roughness:.78}),
+  brass:()=>new THREE.MeshStandardMaterial({color:0xd4a64c,metalness:.85,roughness:.32}),
+  steel:()=>new THREE.MeshStandardMaterial({color:0xa9b0b9,metalness:.9,roughness:.28}),
+  dark:()=>new THREE.MeshStandardMaterial({color:0x5b636e,metalness:.7,roughness:.4}),
+  gasket:()=>new THREE.MeshStandardMaterial({color:0xc9a26a,metalness:0,roughness:.92}),
+  float:()=>new THREE.MeshStandardMaterial({color:0x3d4f66,metalness:.1,roughness:.55}),
+  leather:()=>new THREE.MeshStandardMaterial({color:0x7a4a2a,metalness:0,roughness:.85}),
+  spring:()=>new THREE.MeshStandardMaterial({color:0x8d959f,metalness:.9,roughness:.35}),
+  screen:()=>new THREE.MeshStandardMaterial({color:0xb7bec6,metalness:.8,roughness:.45,wireframe:true}),
+  glass:()=>new THREE.MeshPhysicalMaterial({color:0xffffff,transparent:true,opacity:.28,roughness:.05,metalness:0,depthWrite:false}),
+  fuel:()=>new THREE.MeshStandardMaterial({color:0x3b82f6,transparent:true,opacity:.75,roughness:.2,emissive:0x1e40af,emissiveIntensity:.25}),
+  hose:()=>new THREE.MeshStandardMaterial({color:0x2b2f35,roughness:.8}),
+  red:()=>new THREE.MeshStandardMaterial({color:0xdc2626,roughness:.6}),
+};
+function M(geo, mat){ const m = new THREE.Mesh(geo, MATS[mat]()); m.castShadow = true; m.receiveShadow = true; return m; }
+function orient(m, axis){ if(axis==='x') m.rotation.z = Math.PI/2; else if(axis==='z') m.rotation.x = Math.PI/2; return m; }
+function at(m,x,y,z){ m.position.set(x,y,z); return m; }
+function cyl(r,h,mat,axis='y',seg=28,rTop){ return orient(M(new THREE.CylinderGeometry(rTop??r,r,h,seg),mat),axis); }
+function hex(r,h,mat,axis='y'){ return cyl(r,h,mat,axis,6); }
+function box(w,h,d,mat){ return M(new THREE.BoxGeometry(w,h,d),mat); }
+function ring(ro,ri,h,mat,axis='y'){
+  const p=[new THREE.Vector2(ri,-h/2),new THREE.Vector2(ro,-h/2),new THREE.Vector2(ro,h/2),new THREE.Vector2(ri,h/2),new THREE.Vector2(ri,-h/2)];
+  return orient(M(new THREE.LatheGeometry(p,36),mat),axis);
+}
+class Helix extends THREE.Curve{ constructor(r,len,turns){super();this.r=r;this.len=len;this.turns=turns;}
+  getPoint(t,v=new THREE.Vector3()){const a=t*this.turns*Math.PI*2;return v.set(this.r*Math.cos(a),(t-.5)*this.len,this.r*Math.sin(a));}}
+function coil(r,len,turns,wire,axis='y'){ return orient(M(new THREE.TubeGeometry(new Helix(r,len,turns),turns*24,wire,6),'spring'),axis); }
+function rodBetween(a,b,r,mat,seg=20){
+  const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b); const d=B.clone().sub(A);
+  const m=M(new THREE.CylinderGeometry(r,r,d.length(),seg),mat);
+  m.position.copy(A).add(B).multiplyScalar(.5);
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize()); return m;
+}
+function barBetween(a,b,w,t,mat){ // flat bar in a plane, thickness t along z
+  const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b); const d=B.clone().sub(A);
+  const m=box(d.length(),w,t,mat); m.position.copy(A).add(B).multiplyScalar(.5);
+  m.rotation.z=Math.atan2(d.y,d.x); return m;
+}
+function cotter(x,y,z,axis='z'){ const g=new THREE.Group();
+  const t=M(new THREE.TorusGeometry(.035,.011,8,16),'steel'); g.add(t);
+  const l=cyl(.011,.16,'steel','y'); l.position.y=-.09; g.add(l);
+  if(axis==='z') g.rotation.x=Math.PI/2; if(axis==='x') g.rotation.z=Math.PI/2;
+  g.position.set(x,y,z); return g; }
+/* footprint shapes — shape coordinates are (x, -z) so extrusion maps to world XZ */
+function rrPath(p,x0,x1,z0,z1,r){ const y0=-z1,y1=-z0;
+  p.moveTo(x0+r,y0);p.lineTo(x1-r,y0);p.quadraticCurveTo(x1,y0,x1,y0+r);p.lineTo(x1,y1-r);p.quadraticCurveTo(x1,y1,x1-r,y1);
+  p.lineTo(x0+r,y1);p.quadraticCurveTo(x0,y1,x0,y1-r);p.lineTo(x0,y0+r);p.quadraticCurveTo(x0,y0,x0+r,y0); return p; }
+const circ=(x,z,r)=>{const p=new THREE.Path();p.absarc(x,-z,r,0,Math.PI*2,true);return p;};
+const rrHole=(x0,x1,z0,z1,r)=>rrPath(new THREE.Path(),x0,x1,z0,z1,r);
+function extrudeY(shape,y0,h,mat,bev=0){ const g=new THREE.ExtrudeGeometry(shape,{depth:h-2*bev,bevelEnabled:bev>0,bevelSize:bev,bevelThickness:bev,bevelSegments:3,curveSegments:28});
+  if(bev) g.translate(0,0,bev);
+  const m=M(g,mat); m.rotation.x=-Math.PI/2; m.position.y=y0; return m; }
+const FOOT=[-1.8,1.8,-1.25,1.25,.32];
+const BORE=[0.9,0,.55];
+const CAV=[-1.55,0.2,-0.95,0.55,.18];
+const footShape=(holes)=>{const s=rrPath(new THREE.Shape(),...FOOT); holes.forEach(h=>s.holes.push(h)); return s;};
+const SCREWS=[[-1.0,-1.1],[-0.8,1.05],[0.5,-1.1],[1.55,0.95]];
+
+/* ----- part builders: coordinates are local to the throttle-body or bowl group ----- */
+const B = {
+ TB(){const g=new THREE.Group();
+   g.add(extrudeY(footShape([circ(...BORE)]),0,.45,'cast',.03));
+   g.add(at(ring(.8,.55,.8,'cast'),.9,.85,0));
+   const fl=rrPath(new THREE.Shape(),-.05,1.85,-.95,.95,.15); fl.holes.push(circ(.9,0,.55));
+   [[.2,.7],[1.6,.7],[.2,-.7],[1.6,-.7]].forEach(([x,z])=>fl.holes.push(circ(x,z,.08)));
+   g.add(extrudeY(fl,1.25,.15,'cast',.025));
+   g.add(at(cyl(.2,.3,'cast','z'),.9,.85,.9)); g.add(at(cyl(.2,.3,'cast','z'),.9,.85,-.9));
+   g.add(at(cyl(.24,.27,'cast'),-1.3,.585,.9)); g.add(at(cyl(.2,.3,'cast'),-.3,.6,.9));
+   g.add(at(cyl(.22,.3,'cast','x'),-1.85,.225,-.3)); g.add(at(cyl(.15,.35,'cast','x'),1.62,.95,.45));
+   g.add(at(box(.28,.28,.3,'cast'),1.5,.55,-1.12)); return g;},
+ BW(){const g=new THREE.Group();
+   g.add(extrudeY(footShape([circ(...BORE),rrHole(...CAV),circ(-1.3,.9,.2),circ(-.3,.9,.1),circ(.28,.75,.045)]),-2.2,2.2,'cast',.03));
+   g.add(extrudeY(footShape([circ(...BORE)]),-2.4,.2,'cast',.03));
+   g.add(at(cyl(.2,.15,'cast','z'),.3,-1.6,1.3)); g.add(at(cyl(.2,.2,'cast'),1.55,-2.5,0));
+   g.add(at(cyl(.18,.12,'cast'),-.8,-2.46,-.2)); g.add(at(cyl(.27,.1,'cast'),-1.3,-2.45,.9));
+   return g;},
+ PDT(){const g=new THREE.Group(); g.add(rodBetween([.72,-1.4,0],[.8,.25,0],.03,'brass')); return g;},
+ 65(){const c=document.createElement('canvas');c.width=256;c.height=128;const x=c.getContext('2d');
+   x.fillStyle='#fff';x.fillRect(0,0,256,128);x.fillStyle='#c81e1e';x.fillRect(0,0,256,40);
+   x.fillStyle='#fff';x.font='bold 30px sans-serif';x.textAlign='center';x.fillText('WARNING',128,31);
+   x.fillStyle='#222';x.font='15px sans-serif';x.fillText('Use only Precision',128,68);x.fillText('authorized parts',128,90);
+   const m=new THREE.Mesh(new THREE.PlaneGeometry(1.1,.55),new THREE.MeshStandardMaterial({map:new THREE.CanvasTexture(c),roughness:.7}));
+   m.rotation.y=Math.PI; m.position.set(-.5,-1.2,-1.258); const g=new THREE.Group(); g.add(m); return g;},
+ 1(){const g=new THREE.Group(); SCREWS.forEach(([x,z])=>{g.add(at(cyl(.15,.025,'steel'),x,.465,z));
+   for(let i=0;i<3;i++){const t=box(.06,.025,.08,'steel');const a=i*2.1;t.position.set(x+Math.cos(a)*.17,.465,z+Math.sin(a)*.17);t.rotation.y=-a;g.add(t);}}); return g;},
+ 2(){const g=new THREE.Group(); SCREWS.forEach(([x,z])=>{g.add(at(hex(.11,.12,'steel'),x,.54,z));g.add(at(cyl(.05,.5,'steel'),x,.23,z));}); return g;},
+ 8(){return wrap(extrudeY(footShape([circ(...BORE),rrHole(...CAV),circ(-1.3,.9,.2),circ(-.3,.9,.1)]),-.025,.025,'gasket'));},
+ 64(){const g=new THREE.Group(); g.add(at(box(.28,.04,1.3,'steel'),.08,-.045,-.1));
+   g.add(at(box(.2,.42,.04,'steel'),.08,-.26,-.72)); g.add(at(box(.2,.42,.04,'steel'),.08,-.26,.52)); return g;},
+ 63(){const g=new THREE.Group(); g.add(at(hex(.06,.06,'steel'),.08,-.095,-.45)); g.add(at(hex(.06,.06,'steel'),.08,-.095,.25)); return g;},
+ 4(){return wrap(at(cyl(.03,1.36,'steel','z'),.08,-.36,-.1));},
+ 3(){return wrap(cotter(.08,-.36,.6,'z'));},
+ 5(){const g=new THREE.Group();
+   g.add(at(box(.9,.42,.38,'float'),-.9,-1.08,-.55)); g.add(at(box(.9,.42,.38,'float'),-.9,-1.08,.15));
+   g.add(at(box(.75,.035,1.05,'brass'),-.12,-.85,-.2));
+   g.add(at(box(.1,.52,.035,'brass'),.08,-.6,-.66)); g.add(at(box(.1,.52,.035,'brass'),.08,-.6,.46));
+   g.add(at(box(.12,.03,.12,'brass'),-.15,-.825,-.2)); return g;},
+ 6(){const t=M(new THREE.TorusGeometry(.07,.012,8,20,Math.PI*1.5),'steel'); t.rotation.x=Math.PI/2; return wrap(at(t,-.15,-.74,-.2));},
+ 7(){const g=new THREE.Group(); g.add(at(cyl(.05,.52,'steel'),-.15,-.5,-.2)); g.add(at(cyl(.05,.12,'steel','y',20,0),-.15,-.18,-.2)); return g;},
+ 27(){const g=new THREE.Group(); g.add(at(hex(.12,.1,'brass'),-.15,-.1,-.2)); return g;},
+ 28(){return wrap(at(ring(.11,.05,.015,'gasket'),-.15,-.04,-.2));},
+ // accelerating pump
+ 11(){const g=new THREE.Group(); g.add(at(cyl(.045,2.7,'steel'),-1.3,-.25,.9)); g.add(at(cyl(.06,.1,'steel','z'),-1.3,1.12,.9));
+   g.add(at(cyl(.18,.16,'leather'),-1.3,-1.6,.9)); g.add(at(cyl(.12,.05,'steel'),-1.3,-1.5,.9)); g.add(at(coil(.09,.5,6,.014),-1.3,-1.2,.9)); return g;},
+ 10(){return wrap(at(box(.06,.06,.32,'steel'),-1.3,1.12,1.04));},
+ 9(){const g=new THREE.Group(); g.add(cotter(-1.22,1.12,.9,'x')); g.add(cotter(-1.22,1.12,1.18,'x')); return g;},
+ 13(){const g=new THREE.Group(); g.add(barBetween([.9,.85,1.18],[-1.3,1.12,1.18],.16,.05,'steel'));
+   g.add(at(cyl(.15,.07,'steel','z'),.9,.85,1.18)); g.add(at(cyl(.11,.06,'steel','z'),-1.3,1.12,1.18));
+   [[-1.05,1.05],[-1.18,1.2],[-0.92,1.17]].forEach(([x,y])=>g.add(at(cyl(.025,.07,'dark','z'),x,y,1.18))); return g;},
+ 12(){const g=new THREE.Group(); g.add(at(hex(.06,.08,'steel'),.9,1.06,1.18)); g.add(at(cyl(.025,.15,'steel'),.9,.97,1.18)); return g;},
+ 14(){return wrap(at(coil(.12,.1,3,.014,'z'),.9,.85,1.1));},
+ 15(){return wrap(at(ring(.17,.06,.03,'steel'),-1.3,.735,.9));},
+ 16(){return wrap(at(ring(.15,.05,.05,'leather'),-1.3,.7,.9));},
+ // mixture control
+ 24(){const g=new THREE.Group(); g.add(at(cyl(.065,2.8,'steel'),-.3,-.45,.9)); g.add(at(cyl(.08,.1,'steel'),-.3,.92,.9));
+   g.add(at(cyl(.075,.3,'brass'),-.3,-1.7,.9)); return g;},
+ 25(){const t=M(new THREE.TorusGeometry(.085,.015,8,20,Math.PI*1.6),'steel'); t.rotation.x=Math.PI/2; return wrap(at(t,-.3,-.08,.9));},
+ 26(){return wrap(at(ring(.13,.065,.02,'gasket'),-.3,-.04,.9));},
+ 23(){return wrap(at(ring(.13,.066,.04,'leather'),-.3,.77,.9));},
+ 22(){return wrap(at(ring(.15,.066,.02,'steel'),-.3,.8,.9));},
+ 21(){return wrap(at(coil(.1,.14,4,.013),-.3,.88,.9));},
+ 20(){const t=M(new THREE.TorusGeometry(.05,.008,6,16),'steel'); t.rotation.x=Math.PI/2; return wrap(at(t,-.24,.965,.9));},
+ 19(){const g=new THREE.Group(); g.add(at(cyl(.14,.12,'steel'),-.3,1.03,.9)); g.add(at(box(.09,.06,.8,'steel'),-.3,1.03,1.35));
+   g.add(at(cyl(.06,.08,'steel','x'),-.3,1.03,1.72)); return g;},
+ 18(){return wrap(at(ring(.08,.03,.02,'steel','x'),-.14,1.03,.9));},
+ 17(){const g=new THREE.Group(); g.add(at(hex(.065,.07,'steel','x'),-.09,1.03,.9)); return g;},
+ // throttle
+ 34(){const g=new THREE.Group(); g.add(at(cyl(.07,2.9,'steel','z'),.9,.85,-.2)); return g;},
+ 33(){const d=cyl(.53,.025,'brass'); d.rotation.z=.14; return wrap(at(d,.9,.85,0));},
+ 32(){const g=new THREE.Group(); g.add(at(cyl(.045,.03,'steel'),.9,.89,.2)); g.add(at(cyl(.045,.03,'steel'),.9,.89,-.2)); return g;},
+ 31(){const g=new THREE.Group(); g.add(at(cyl(.15,.09,'steel','z'),.9,.85,-1.4));
+   g.add(barBetween([.9,.85,-1.4],[1.85,.25,-1.4],.18,.07,'steel')); g.add(at(cyl(.06,.09,'dark','z'),1.85,.25,-1.4)); return g;},
+ 30(){return wrap(at(hex(.1,.09,'steel','z'),.9,.85,-1.5));},
+ 29(){return wrap(cotter(.9,.85,-1.6,'x'));},
+ 35(){const g=new THREE.Group(); g.add(at(cyl(.045,.55,'steel','z'),1.5,.55,-1.32)); g.add(at(cyl(.07,.08,'steel','z'),1.5,.55,-1.62)); return g;},
+ 36(){return wrap(at(coil(.075,.24,6,.011,'z'),1.5,.55,-1.42));},
+ 37(){const g=new THREE.Group(); g.add(at(cyl(.035,.6,'steel','x'),2.05,.95,.45)); g.add(at(cyl(.08,.14,'brass','x'),2.4,.95,.45)); return g;},
+ 38(){return wrap(at(coil(.065,.22,6,.011,'x'),1.98,.95,.45));},
+ 39(){return wrap(at(ring(.09,.04,.03,'steel','x'),1.81,.95,.45));},
+ 43(){const p=[[.47,0],[.52,0],[.52,.42],[.46,.42],[.32,.2],[.47,0]].map(([r,y])=>new THREE.Vector2(r,y));
+   const g=new THREE.Group(); g.add(at(M(new THREE.LatheGeometry(p,40),'cast'),.9,0,0)); g.add(at(ring(.08,.06,.12,'cast'),.86,.18,0));
+   g.add(rodBetween([.86,.18,.08],[.9,.18,.4],.015,'cast')); return g;},
+ 44(){const g=new THREE.Group(); g.add(at(ring(.1,.07,.26,'brass','z'),.9,.85,.9)); g.add(at(ring(.1,.07,.26,'brass','z'),.9,.85,-.9)); return g;},
+ 45(){return wrap(at(cyl(.05,.1,'brass'),-.6,-.05,.75));},
+ 42(){return wrap(at(cyl(.07,.02,'screen'),-1.0,-.012,.72));},
+ 66(){return wrap(at(cyl(.05,.06,'brass','z'),.3,.22,1.27));},
+ 46(){const g=new THREE.Group(); g.add(at(hex(.17,.2,'brass','x'),-2.15,.225,-.3)); g.add(at(cyl(.11,.4,'brass','x'),-2.45,.225,-.3));
+   g.add(at(cyl(.08,.5,'screen','x'),-1.8,.225,-.3)); return g;},
+ 47(){return wrap(at(ring(.17,.09,.02,'gasket','x'),-2.04,.225,-.3));},
+ // bowl parts
+ 48(){return wrap(at(cyl(.035,.9,'brass'),.28,-.45,.75));},
+ 49(){const g=new THREE.Group(); g.add(at(hex(.12,.12,'steel'),-.8,-2.58,-.2)); g.add(at(cyl(.07,.12,'steel'),-.8,-2.47,-.2)); return g;},
+ 50(){const A=[1.55,-2.55,0],Bp=[.98,-.55,0]; const g=new THREE.Group(); g.add(rodBetween(A,Bp,.07,'brass'));
+   const h=hex(.12,.14,'brass'); h.position.set(1.57,-2.62,0); h.rotation.z=.29; g.add(h); return g;},
+ 51(){const r=ring(.14,.075,.02,'steel'); r.position.set(1.545,-2.49,0); r.rotation.z=.29; return wrap(r);},
+ 52(){const r=ring(.09,.05,.02,'gasket'); r.position.set(1.53,-2.46,0); r.rotation.z=.29; return wrap(r);},
+ 53(){const g=new THREE.Group(); g.add(at(hex(.12,.35,'brass','z'),.3,-1.6,1.6)); g.add(at(cyl(.07,.15,'brass','z'),.3,-1.6,1.84)); return g;},
+ 54(){return wrap(at(ring(.15,.07,.02,'steel','z'),.3,-1.6,1.405));},
+ 55(){return wrap(at(ring(.14,.07,.015,'gasket','z'),.3,-1.6,1.385));},
+ 62(){return wrap(at(cyl(.07,.12,'brass'),-1.3,-2.47,.9));},
+ 61(){return wrap(at(cyl(.1,.04,'screen'),-1.3,-2.53,.9));},
+ 60(){return wrap(at(box(.6,.015,.36,'gasket'),-1.3,-2.507,.9));},
+ 59(){return wrap(at(hex(.16,.14,'brass'),-1.3,-2.6,.9));},
+ 58(){return wrap(at(box(.62,.03,.36,'steel'),-1.3,-2.685,.9));},
+ 57(){const g=new THREE.Group(); g.add(at(cyl(.07,.015,'steel'),-1.52,-2.71,.9)); g.add(at(cyl(.07,.015,'steel'),-1.08,-2.71,.9)); return g;},
+ 56(){const g=new THREE.Group(); g.add(at(hex(.055,.06,'steel'),-1.52,-2.75,.9)); g.add(at(hex(.055,.06,'steel'),-1.08,-2.75,.9)); return g;},
+};
+function wrap(m){const g=new THREE.Group(); g.add(m); return g;}
+
+/* explode offsets (local) for removed parts */
+const EX = {
+ 1:[0,1.2,0],2:[0,2.0,0],3:[0,0,1.6],4:[0,0,-2.3],5:[-2.7,-.3,0],6:[-1.7,-.9,-1.1],7:[-1.3,-1.1,-1.7],8:[0,-1.0,0],
+ 9:[-.6,.7,1.2],10:[-.4,.95,1.6],11:[-2.0,.6,1.5],12:[0,1.0,.9],13:[0,.4,1.5],14:[0,0,2.1],15:[0,1.7,0],16:[0,1.35,0],
+ 17:[.9,2.65,0],18:[.45,2.65,0],19:[0,2.25,0],20:[0,1.95,0],21:[0,1.7,0],22:[0,1.45,0],23:[0,1.2,0],
+ 24:[0,0,2.1],25:[.5,-.3,1.7],26:[.5,0,1.7],27:[0,-1.0,-.5],28:[0,-.7,-.5],29:[0,0,-1.7],30:[0,0,-1.3],31:[0,0,-.95],
+ 32:[0,2.6,0],33:[0,2.15,0],34:[0,0,-3.1],35:[0,0,-1.6],36:[0,0,-1.2],37:[1.6,0,0],38:[1.1,0,0],39:[.7,0,0],
+ 42:[0,-.8,.9],43:[0,-2.0,0],44:[0,1.6,0],45:[0,-.8,.6],46:[-1.8,0,0],47:[-1.2,0,0],63:[0,-1.1,-1.9],64:[0,-1.6,-1.9],66:[0,0,1.0],
+ 48:[0,1.7,0],49:[.9,-1.0,-.9],50:[.44,-1.54,0],51:[.33,-1.15,0],52:[.22,-.8,0],53:[0,0,1.6],54:[0,0,1.2],55:[0,0,.9],
+ 56:[0,-2.55,0],57:[0,-2.25,0],58:[0,-1.95,0],59:[0,-1.6,0],60:[0,-1.3,0],61:[0,-1.0,0],62:[0,-.7,0],
+};
+const SEP_Y = 3.2;
+
+const tbGroup = new THREE.Group(), bwGroup = new THREE.Group();
+scene.add(tbGroup, bwGroup);
+const OBJ = {}; const pickables = [];
+for(const r in PARTS){
+  const o = B[r](); o.userData.ref = r;
+  o.userData.ex = new THREE.Vector3(...(EX[r]||[0,0,0]));
+  o.userData.from = new THREE.Vector3(); o.userData.to = new THREE.Vector3();
+  o.traverse(c=>{ if(c.isMesh){ c.userData.ref=r; c.userData.baseEm = c.material.emissive?c.material.emissive.getHex():0; c.userData.baseEI = c.material.emissiveIntensity??1;
+    c.userData.baseOp = c.material.opacity; c.userData.baseTr = c.material.transparent; pickables.push(c);} });
+  (PARTS[r].g==='tb'?tbGroup:bwGroup).add(o); OBJ[r]=o;
+}
+
+/* test fixtures */
+const sight = new THREE.Group(); bwGroup.add(sight); sight.visible=false;
+sight.add(at(cyl(.11,3.6,'glass'),-2.8,-1.1,-.2));
+const fuelCol = at(cyl(.085,1,'fuel'),-2.8,-2.9,-.2); sight.add(fuelCol);
+const hoseCurve = new THREE.CatmullRomCurve3([[-.8,-2.55,-.2],[-.8,-3.1,-.2],[-1.6,-3.35,-.2],[-2.6,-3.3,-.2],[-2.8,-3.0,-.2],[-2.8,-2.9,-.2]].map(p=>new THREE.Vector3(...p)));
+sight.add(M(new THREE.TubeGeometry(hoseCurve,40,.05,8),'hose'));
+sight.add(at(box(.5,.02,.02,'red'),-2.8,0,-.2));
+const stream = new THREE.Group(); tbGroup.add(stream); stream.visible=false;
+const streamMesh = at(cyl(.03,2.4,'fuel','y',12,.09),.8,1.6,0); stream.add(streamMesh);
+
+/* =====================================================================
+   STATE, ANIMATION, HIGHLIGHT
+   ===================================================================== */
+let anim = {start:0,dur:900,sepFrom:0,sepTo:0};
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let xray=false, stepXray=false, showLabels=true, autoFocus=true, mode='guide';
+let highlighted = new Set(), dimmed = new Set();
+let fixture = null;
+
+function setLayout({out=new Set(), sep=0, factor=null}, animate=true){
+  for(const r in OBJ){ const o=OBJ[r];
+    o.userData.from.copy(o.position);
+    if(PARTS[r].fixed) o.userData.to.set(0,0,0);
+    else if(factor!=null) o.userData.to.copy(o.userData.ex).multiplyScalar(factor);
+    else o.userData.to.copy(out.has(+r)?o.userData.ex:new THREE.Vector3());
+  }
+  anim.sepFrom = tbGroup.position.y; anim.sepTo = sep;
+  anim.start = performance.now(); anim.dur = (animate && !reduceMotion) ? 950 : 0;
+}
+const ease = t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+function tickAnim(now){
+  const t = anim.dur? Math.min(1,(now-anim.start)/anim.dur):1, e=ease(t);
+  for(const r in OBJ){const u=OBJ[r].userData; OBJ[r].position.lerpVectors(u.from,u.to,e);}
+  tbGroup.position.y = anim.sepFrom + (anim.sepTo-anim.sepFrom)*e;
+}
+function applyLook(){
+  for(const m of pickables){ const r=m.userData.ref, mat=m.material;
+    const isCast = (r==='TB'||r==='BW');
+    const hl = highlighted.has(r);
+    const xr = xray || stepXray;
+    if(mat.emissive){ mat.emissive.setHex(hl?0xff6a00:m.userData.baseEm); mat.emissiveIntensity = hl?(isCast?0.16:0.55):m.userData.baseEI; }
+    let op = m.userData.baseOp, tr = m.userData.baseTr;
+    if(isCast && xr){op=.22;tr=true;}
+    if(dimmed.has(r) && !hl){op=Math.min(op,.4);tr=true;}
+    mat.opacity=op; mat.transparent=tr; mat.depthWrite = op>.5; mat.needsUpdate=true;
+  }
+}
+function setHighlight(list){ highlighted = new Set((list||[]).map(String)); applyLook(); buildLabels(); }
+
+/* labels */
+const labelsEl = document.getElementById('labels'); let labelEls=[];
+function buildLabels(){
+  labelsEl.innerHTML=''; labelEls=[];
+  if(!showLabels || (mode==='test')) return;
+  for(const r of highlighted){ if(r==='TB'||r==='BW') continue;
+    const d=document.createElement('div'); d.className='plabel'; d.textContent=pname(r); labelsEl.appendChild(d); labelEls.push([r,d]); }
+}
+const _v=new THREE.Vector3(), _box=new THREE.Box3();
+function partCenter(r,out){ _box.setFromObject(OBJ[r]); return _box.getCenter(out); }
+function updateLabels(){
+  const w=viewer.clientWidth,h=viewer.clientHeight;
+  const placed=[];
+  for(const [r,d] of labelEls){ partCenter(r,_v); _box.setFromObject(OBJ[r]); _v.y=_box.max.y;
+    _v.project(camera); if(_v.z>1){d.style.display='none';continue;}
+    let x=(_v.x*.5+.5)*w, y=(-_v.y*.5+.5)*h-6;
+    for(const p of placed){ if(Math.abs(p[0]-x)<120 && Math.abs(p[1]-y)<22) y=p[1]-24; }
+    placed.push([x,y]); d.style.display=''; d.style.left=x+'px'; d.style.top=y+'px'; }
+}
+
+/* camera focus */
+let camAnim=null;
+function focusOn(refs){
+  if(!autoFocus) return;
+  const b=new THREE.Box3(); let any=false;
+  // use target layout positions: compute after anim finishes → approximate by temporarily setting positions
+  const saved={}; for(const r in OBJ){saved[r]=OBJ[r].position.clone(); OBJ[r].position.copy(OBJ[r].userData.to);} const sy=tbGroup.position.y; tbGroup.position.y=anim.sepTo;
+  scene.updateMatrixWorld(true);
+  for(const r of refs){ if(!OBJ[r]) continue; b.expandByObject(OBJ[r]); any=true; }
+  for(const r in OBJ) OBJ[r].position.copy(saved[r]); tbGroup.position.y=sy; scene.updateMatrixWorld(true);
+  if(!any) return;
+  const c=b.getCenter(new THREE.Vector3()), rad=Math.max(b.getSize(new THREE.Vector3()).length()*.5,.8);
+  const dist=THREE.MathUtils.clamp(rad*3.4,6.5,17);
+  const dir=camera.position.clone().sub(controls.target).normalize();
+  camAnim={t0:performance.now(),dur:reduceMotion?0:900,fromT:controls.target.clone(),toT:c,fromP:camera.position.clone(),toP:c.clone().add(dir.multiplyScalar(dist))};
+}
+function resetView(far=false){ const p=far?HOME.pos.clone().multiplyScalar(1.35):HOME.pos.clone(); camAnim={t0:performance.now(),dur:reduceMotion?0:700,fromT:controls.target.clone(),toT:HOME.tgt.clone().add(new THREE.Vector3(0,far?.8:0,0)),fromP:camera.position.clone(),toP:p}; }
+function tickCam(now){ if(!camAnim) return; const t=camAnim.dur?Math.min(1,(now-camAnim.t0)/camAnim.dur):1,e=ease(t);
+  controls.target.lerpVectors(camAnim.fromT,camAnim.toT,e); camera.position.lerpVectors(camAnim.fromP,camAnim.toP,e); if(t>=1) camAnim=null; }
+
+/* render loop */
+function resize(){ const w=viewer.clientWidth,h=viewer.clientHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(viewer);
+function loop(now){
+  tickAnim(now); tickCam(now); controls.update();
+  if(fixture==='sight'){ const lvl = -0.62 + (Math.sin(now/1600)>0?0.06:0); const top=-2.9+Math.min(1,(now%9000)/2500)*(lvl+2.9);
+    const hgt=Math.max(.02,top+2.9); fuelCol.scale.y=hgt; fuelCol.position.y=-2.9+hgt/2; }
+  if(fixture==='pump'){ const ph=(now%2600)/2600; const s= ph<.12? ph/.12 : Math.max(0,1-(ph-.12)/.55);
+    streamMesh.scale.set(s,Math.max(.01,s),s); streamMesh.position.y = .45+1.2*Math.max(.01,s); streamMesh.material.opacity=.8*s; }
+  updateLabels(); renderer.render(scene,camera); requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+document.getElementById('loading').remove();
+
+/* =====================================================================
+   GUIDE MODE
+   ===================================================================== */
+let stepIdx = 0;
+function stateAt(i){ const out=new Set(); let sep=0;
+  for(let k=0;k<=i;k++){ const s=STEPS[k]; (s.rm||[]).forEach(r=>out.add(r)); (s.in||[]).forEach(r=>out.delete(r)); if(s.sep===true)sep=SEP_Y; if(s.sep===false)sep=0; }
+  return {out,sep};
+}
+const REPLACE = Object.keys(PARTS).filter(k=>PARTS[k].rep);
+function stepHL(s){ if(s.hl==='replace') return REPLACE; return [...new Set([...(s.rm||[]),...(s.in||[]),...(s.hl||[])].map(String))]; }
+function showStep(i, animate=true){
+  stepIdx = Math.max(0,Math.min(STEPS.length-1,i));
+  const s=STEPS[stepIdx];
+  // start from previous state so the move animates
+  if(animate && stepIdx>0){ const p=stateAt(stepIdx-1); setLayout(p,false); tickAnim(performance.now()); }
+  const st=stateAt(stepIdx); setLayout(st,animate);
+  fixture = s.fx||null; sight.visible = fixture==='sight'; stream.visible = fixture==='pump';
+  dimmed = new Set([...st.out].map(String));
+  stepXray = !!s.xr;
+  const hl=stepHL(s); setHighlight(hl);
+  const small=hl.filter(r=>r!=='TB'&&r!=='BW');
+  focusOn(s.fc || (small.length?small:['TB','BW']));
+  renderStepCard(s);
+  try{localStorage.setItem('carbStep',String(stepIdx));}catch(e){}
+}
+function chips(list){ return list.filter(r=>PARTS[r]).map(r=>`<button class="pchip" data-ref="${r}">${pname(r)}</button>`).join(''); }
+function renderStepCard(s){
+  const card=document.getElementById('stepCard');
+  const hl=stepHL(s);
+  const action = s.rm?'<span class="sr-only">Parts removed: </span>':(s.in?'<span class="sr-only">Parts installed: </span>':'');
+  card.innerHTML = `<span class="mref">${s.m==='Intro'?'Intro':'Manual step '+s.m}</span><span class="secname">${s.secName}</span>
+   <h2 id="stepTitle" tabindex="-1">${s.t}</h2><p>${s.d}</p>
+   ${s.tq?`<div class="box tq"><b>Torque / spec</b>${s.tq}</div>`:''}
+   ${s.tools?`<div class="box note"><b>Tools</b>${s.tools}</div>`:''}
+   ${s.warn?`<div class="box warn"><b>Caution</b>${s.warn}</div>`:''}
+   ${s.note?`<div class="box note"><b>Note</b>${s.note}</div>`:''}
+   ${s.table==='wear'?`<div style="margin-top:10px"><b style="font-size:13px">Table I — Wear limits</b>${wearTable()}</div>`:''}
+   ${hl.length?`<div class="parts" aria-label="Parts in this step">${action}${chips(hl)}</div>`:''}`;
+  card.querySelectorAll('.pchip').forEach(b=>b.onclick=()=>{ focusOnly(b.dataset.ref); showPartCard(b.dataset.ref); });
+  document.getElementById('stepCount').textContent=`Step ${stepIdx+1} of ${STEPS.length}`;
+  document.getElementById('prog').style.width=((stepIdx)/(STEPS.length-1)*100)+'%';
+  document.getElementById('prev').disabled = stepIdx===0;
+  document.getElementById('next').disabled = stepIdx===STEPS.length-1;
+  document.querySelectorAll('#secnav .chip').forEach(c=>c.setAttribute('aria-current', String(c.dataset.sec===s.secName)));
+  announce(`${s.m==='Intro'?'':'Manual step '+s.m+'. '}${s.t}.`);
+}
+function focusOnly(r){ const keep=autoFocus; autoFocus=true; focusOn([r]); autoFocus=keep; }
+// section nav
+{ const nav=document.getElementById('secnav'); const seen=new Set();
+  STEPS.forEach((s,i)=>{ if(seen.has(s.secName)) return; seen.add(s.secName);
+    const b=document.createElement('button'); b.className='chip'; b.textContent=s.secName; b.dataset.sec=s.secName;
+    b.onclick=()=>showStep(i,false); nav.appendChild(b); }); }
+document.getElementById('prev').onclick=()=>showStep(stepIdx-1);
+document.getElementById('next').onclick=()=>showStep(stepIdx+1);
+document.getElementById('replay').onclick=()=>showStep(stepIdx);
+addEventListener('keydown',e=>{
+  if(mode!=='guide' || e.target.closest('input,textarea,dialog') ) return;
+  if(e.key==='ArrowRight'){showStep(stepIdx+1);e.preventDefault();}
+  if(e.key==='ArrowLeft'){showStep(stepIdx-1);e.preventDefault();}
+});
+
+/* =====================================================================
+   PART CARD + PICKING
+   ===================================================================== */
+const pc=document.getElementById('partcard'), pcBody=document.getElementById('pcBody');
+function showPartCard(r){
+  if(mode==='test') return;
+  const p=PARTS[r];
+  pcBody.innerHTML=`<h3>${pname(r)}</h3><div style="color:var(--muted);font-size:12.5px">${p.g==='tb'?'Throttle body side':'Fuel bowl side'}${p.rep?' · ♻ always replaced at overhaul':''}</div>
+   <dl>${p.rmStep?`<dt>Removed</dt><dd>Step ${p.rmStep}</dd>`:''}${p.inStep?`<dt>Installed</dt><dd>Step ${p.inStep}</dd>`:''}
+   ${p.tq?`<dt>Torque</dt><dd>${p.tq}</dd>`:''}${p.wear?`<dt>Wear limit</dt><dd>${p.wear}</dd>`:''}</dl>`;
+  pc.style.display='block';
+}
+document.getElementById('pcClose').onclick=()=>{pc.style.display='none';};
+const ray=new THREE.Raycaster(), mouse=new THREE.Vector2(); const tip=document.getElementById('tip');
+function pick(ev){ const r=renderer.domElement.getBoundingClientRect(); mouse.set(((ev.clientX-r.left)/r.width)*2-1,-((ev.clientY-r.top)/r.height)*2+1);
+  ray.setFromCamera(mouse,camera); const hits=ray.intersectObjects(pickables.filter(m=>m.visible),false);
+  for(const h of hits){ const ref=h.object.userData.ref; const op=h.object.material.opacity; if(op<.3 && (ref==='TB'||ref==='BW')) continue; return ref; } return null; }
+let down=null;
+renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];});
+renderer.domElement.addEventListener('pointerup',e=>{ if(!down) return; const moved=Math.hypot(e.clientX-down[0],e.clientY-down[1]); down=null;
+  if(moved>5 || mode==='test') return; const r=pick(e); if(!r) return;
+  showPartCard(r); if(mode==='explore'){ selectExplore(r); } });
+renderer.domElement.addEventListener('pointermove',e=>{ if(mode==='test'||e.buttons){tip.style.display='none';return;}
+  const r=pick(e); if(!r){tip.style.display='none';renderer.domElement.style.cursor='';return;}
+  const b=viewer.getBoundingClientRect(); tip.textContent=pname(r); tip.style.display='block';
+  tip.style.left=(e.clientX-b.left+14)+'px'; tip.style.top=(e.clientY-b.top+14)+'px'; renderer.domElement.style.cursor='pointer'; });
+renderer.domElement.addEventListener('pointerleave',()=>tip.style.display='none');
+
+/* =====================================================================
+   EXPLORE MODE
+   ===================================================================== */
+const explode=document.getElementById('explode'); let exploreSel=null;
+function applyExplore(animate=true){ const f=explode.value/100; document.getElementById('explodeVal').textContent=explode.value+'%';
+  setLayout({factor:f, sep:SEP_Y*f}, animate); }
+explode.addEventListener('input',()=>applyExplore(false));
+function selectExplore(r){ exploreSel=r; setHighlight([r]);
+  document.querySelectorAll('#plist .pbtn').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.ref===r)));
+  focusOnly(r); }
+{ const pl=document.getElementById('plist');
+  const grp=(g,title)=>{ const keys=Object.keys(PARTS).filter(k=>PARTS[k].g===g).sort((a,b)=>(+a||999)-(+b||999));
+    return `<h3>${title}</h3><div class="grid">${keys.map(k=>`<button class="pbtn" data-ref="${k}" aria-pressed="false"><span class="n">${/^\d+$/.test(k)?k:'—'}</span>${PARTS[k].n}${PARTS[k].rep?' ♻':''}</button>`).join('')}</div>`; };
+  pl.innerHTML = grp('tb','Throttle body side')+grp('bw','Fuel bowl side');
+  pl.querySelectorAll('.pbtn').forEach(b=>b.onclick=()=>{ selectExplore(b.dataset.ref); showPartCard(b.dataset.ref); }); }
+
+/* =====================================================================
+   TEST MODE
+   ===================================================================== */
+const KQ = [
+ ['What torque does Table II give for the throttle valve screws (32)?','10–15 in-lb',['8–11 in-lb','20–28 in-lb','35–45 in-lb'],'Step 34 · Table II'],
+ ['What torque is used for the throttle body-to-bowl (bowl cover) screws (2)?','35–45 in-lb',['25–30 in-lb','45–60 in-lb','50–70 in-lb'],'Step 77 · Table II'],
+ ['What torque is used for the float valve seat (27)?','10–12 ft-lb',['10–12 in-lb','25–30 in-lb','45–60 in-lb'],'Step 50 · Table II'],
+ ['What torque is used for the fuel inlet fitting-strainer assembly (46)?','10–12 ft-lb',['3–5 in-lb','14–18 in-lb','20–60 in-lb'],'Step 49 · Table II'],
+ ['What torque is used for the pump discharge check valve assembly (53)?','50–70 in-lb',['8–12 in-lb','14–18 in-lb','35–45 in-lb'],'Step 64 · Table II'],
+ ['What torque does Table II list for the nozzle (50)?','45–60 in-lb',['3–5 in-lb','25–30 in-lb','10–12 ft-lb'],'Table II'],
+ ['What torque is used for the idle tube (48)?','3–5 in-lb',['8–11 in-lb','12–16 in-lb','25–30 in-lb'],'Step 63 · Table II'],
+ ['What torque is used for the bowl drain plug (49)?','25–30 in-lb',['3–5 in-lb','35–45 in-lb','50–70 in-lb'],'Step 67 · Table II'],
+ ['What torque range is given for the throttle lever retaining nut (30)?','20–60 in-lb',['8–11 in-lb','10–15 in-lb','50–70 in-lb'],'Step 42 · Table II'],
+ ['What torque is used for the float bracket screws (63)?','8–11 in-lb',['3–5 in-lb','14–18 in-lb','35–45 in-lb'],'Step 41 · Table II'],
+ ['What torque is used for the pump inlet retainer (strainer housing) screws (56)?','14–18 in-lb',['8–12 in-lb','25–30 in-lb','50–70 in-lb'],'Step 66 · Table II'],
+ ['How is the idle drill plug (66) installed?','12–16 in-lb with Loctite 222 or equivalent mild threadlock',['3–5 in-lb, dry threads','25–30 in-lb with thread lube','10–12 ft-lb with RC-680'],'Step 33'],
+ ['What is the float level setting?','7/32" between float and gasket, near the outer end of each float',['1/2" between float and gasket','5/32" measured at the hinge','.005" between float and valve'],'Step 57 · Figure 14'],
+ ['About how much float travel should there be at the outer end of the float?','About 1/2 inch',['About 7/32 inch','About 1/16 inch','About 1 inch'],'Step 57'],
+ ['How much clearance should the float valve retractor clip allow?','About .005"',['None — it should hold the valve tight','About 1/32"','About 7/32"'],'Step 54 · Figure 13'],
+ ['What is the initial idle needle setting?','1-1/2 to 2 turns out from the seat',['1/2 turn out from the seat','3 to 4 turns out from the seat','Lightly seated, then 1/4 turn out'],'Step 37'],
+ ['Which pump lever hole gives the longest stroke and maximum accelerating fuel?','No. 3 — the outer hole',['No. 1 — the lower hole','No. 2 — the middle hole','All holes give the same stroke'],'Steps 44–45'],
+ ['Which pump lever hole gives the shortest stroke?','No. 1 — the lower hole',['No. 2 — the middle hole','No. 3 — the outer hole','No. 3 — the upper hole'],'Step 45'],
+ ['How are new throttle shaft bushings secured and cured?','Light coat of Loctite RC-680; cure 2–4 hours (heat up to 110°F allowed)',['Loctite 222; cure 15 minutes','Pressed in dry; no cure needed','RC-680; bake at 250°F for 30 minutes'],'Step 28'],
+ ['What is done after the throttle shaft bushings are installed?','Line ream them with reamer M-108',['Polish them with #320 emery cloth','Drill them with a letter drill','Nothing — they are pre-sized'],'Step 29'],
+ ['How is the venturi (43) removed if service is needed?','Pressed out from the throttle valve side with extractor M-120',['Pressed out from the bowl side with M-83','Pulled with bushing remover M-122','Pried out with a screwdriver'],'Step 16 · Figure 2'],
+ ['How is the venturi aligned during installation?','Notch lined up with the nozzle; legs engaged in the bore grooves',['Notch lined up with the fuel inlet','Notch lined up with the throttle lever','Any orientation works'],'Step 31'],
+ ['Which tool safeties (clinches) the throttle valve screws?','M-109',['M-104','M-123','M-133'],'Step 35 · Figure 8'],
+ ['Which model has no accelerating pump circuit?','MA3A',['MA3PA','MA3SPA','MA4SPA'],'Note, page 4'],
+ ['What should be used to clean passages in castings and calibrated parts?','Compressed air, carburetor cleaner and a small soft-bristle brush',['Small drills sized to the passage','Fine wire run through each passage','A wire wheel'],'Step 25'],
+ ['Which parts may go into carburetor cleaner?','Metal parts only',['All parts, including the float','Gaskets and packing only','The float and metal parts'],'Step 24'],
+ ['Which of these is NOT on the "always replace" list?','Venturi',['Float shaft','Throttle shaft bushings','Float valve and seat assembly'],'Step 26'],
+ ['What does the manual say about the pump discharge check valve (53)?','It is factory preset — do not disassemble; replace it if it has been',['Disassemble it and clean the spring','Adjust the spring preload after cleaning','Replace only the spring'],'Steps 22, 65'],
+ ['A lead ball is found where the idle drill plug would be. What do you do?','Do not remove it',['Drill it out','Heat it and remove it','Replace it with a drill plug'],'Step 18'],
+ ['What are the float valve and seat test pressures?','0.4 psi for at least 15 min, then 6.0 psi for at least 5 min after the level stabilizes',['6.0 psi first, then 0.4 psi','0.4 psi for 5 min only','15 psi for 15 min'],'Step 80 A–C'],
+ ['During the float test, fuel rises to the parting surface. What is the correct action?','Separate the castings and clean or replace the float valve and seat',['Bend the tab to lower the float level','Raise the test pressure','Replace the nozzle'],'Step 80 D'],
+ ['What does a correctly working accelerating pump show on test?','A solid stream that gradually dies away',['A brief spurt of air, then fuel','A steady drip','Nothing until the throttle is closed'],'Step 80 E'],
+ ['A weak pump stream, or air, during test points to which parts?','Pump plunger, discharge check valve or inlet check valve',['Float level set too high','Idle needle set too rich','Venturi notch misaligned'],'Step 80 F'],
+ ['How are the safety washers on the bowl cover screws secured?','Bend up at least two tabs on every washer',['Bend up one tab per washer','Leave all tabs flat','Use safety wire instead'],'Step 77'],
+ ['Why is the nozzle installed with the bowl inverted?','So the power jet gasket cannot fall into the well and block the power jet',['So fuel drains out of the bowl','So the nozzle threads self-align','So the safety washer tabs line up'],'Step 68'],
+ ['Which way does the pump inlet retainer flange (58) face?','Chamfered side toward the casting',['Chamfered side away from the casting','Either way','Chamfered side toward the screws'],'Step 66'],
+ ['What preservative is used if the carburetor is stored after overhaul?','MIL-C-4339 soluble corrosion-preventive oil',['SAE 50 engine oil','Loctite safety solvent','100LL avgas'],'Step 81'],
+ ['After full cure, the pump discharge tube joint must withstand how much torque?','48 inch-ounces',['48 inch-pounds','10–12 foot-pounds','8 inch-ounces'],'Step 76 · Figure 19'],
+ ['How are the throttle body and bowl separated?','Tap lightly with a soft-faced hammer and pull the castings apart',['Pry at the parting line with a screwdriver','Heat the bowl with a torch','Apply compressed air through the drain'],'Step 2'],
+ ['Per Table I, what is the minimum permissible worn diameter of the throttle shaft (34)?','.3085"',['.3135"','.3750"','.2500"'],'Table I'],
+ ['Per Table I, what is the maximum permissible worn accelerator pump cylinder?','.630"',['.225"','.132"','.100"'],'Table I'],
+ ['What must you do before removing the throttle lever (31)?','Note the lever position',['Mark the nut with paint','Measure shaft end play','Remove the venturi'],'Step 12'],
+ ['What caution applies while bending the float adjustment tab?','Do not apply pressure to the valve and seat',['Remove the float valve first','Bend the float arm at the hinge instead','Set the level to correct any flooding'],'Step 60'],
+ ['Why should compressed air not be blown on or into the assembled carburetor?','It can damage the float',['It removes the thread lube','It unseats the venturi','It blows the gasket out'],'Step 62'],
+ ['Which tool removes and installs the float valve seat?','M-104',['M-7','M-86','M-510'],'Steps 11, 50'],
+ ['Which tool checks float clearance?','M-510 float clearance gage',['M-104 seat remover','M-134 locating tool','M-83 venturi tool'],'Step 61 · Figure 16'],
+ ['After clinching, the throttle valve stops about 15° short of fully open. What do you do?','Nothing — it is normal and must not be changed',['Re-bend the throttle stop','Replace the throttle shaft','Loosen and re-clinch the screws'],'Step 35'],
+ ['Which way must the loop of the mixture control lock wire (20) face?','Toward the valve',['Away from the valve','Toward the pump','Either way'],'Step 39'],
+ ['What caution applies to thread lube on the drain plug?','Use a small amount, and none may get in ahead of the plug',['Use no lube at all','Pack the threads fully','Use Loctite 222 instead'],'Step 67'],
+ ['Which tools install the pump stem packing?','M-123 stake punch and M-123A pilot',['M-86 driver and M-108 reamer','M-133 and M-134','M-120 and M-83'],'Step 30'],
+];
+const IDQ = ['5','43','50','24','11','27','34','37','53','46','33','49','64','48','13','31','44','62','19','8'];
+let test=null;
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+function buildTest(practice){
+  const ids=shuffle(IDQ).slice(0,7).map(r=>{ const others=shuffle(IDQ.filter(x=>x!==r)).slice(0,3).map(x=>PARTS[x].n);
+    return {q:'Which part is highlighted in orange on the model?',a:PARTS[r].n,w:others,ref:`Exploded view, part (${r})`,part:r}; });
+  const kn=shuffle(KQ).slice(0,18).map(([q,a,w,ref])=>({q,a,w,ref}));
+  const qs=shuffle([...ids,...kn]).map(o=>({...o,opts:shuffle([o.a,...o.w]),pick:null}));
+  test={practice,qs,i:0,done:false,checked:false};
+}
+const tb=document.getElementById('testBody');
+function testStart(){
+  test=null; setLayout({out:new Set(),sep:0},true); setHighlight([]); dimmed=new Set(); applyLook(); fixture=null; sight.visible=stream.visible=false;
+  tb.innerHTML=`<h2 style="font-size:18px;margin:0 0 4px">Knowledge check</h2>
+   <p style="margin:0;color:var(--muted)">25 multiple-choice questions, 1 point each, drawn at random from the manual: procedure, specs, tools, torque values and part identification on the 3D model. Hover names and labels are turned off during the test.</p>
+   <div class="mode">
+     <button id="mPractice"><b>Practice</b>See the correct answer and manual reference after each question.</button>
+     <button id="mExam"><b>Exam</b>No feedback until you finish. Score and full review at the end.</button>
+   </div>`;
+  tb.querySelector('#mPractice').onclick=()=>{buildTest(true);renderQ();};
+  tb.querySelector('#mExam').onclick=()=>{buildTest(false);renderQ();};
+}
+function renderQ(){
+  const q=test.qs[test.i]; test.checked=false;
+  if(q.part){ setLayout({factor:.55,sep:SEP_Y*.55},true); dimmed=new Set(); setHighlight([q.part]); setTimeout(()=>focusOnly(q.part),50); }
+  else { setLayout({out:new Set(),sep:0},true); setHighlight([]); resetView(); }
+  tb.innerHTML=`<div class="stepmeta"><span>Question ${test.i+1} of ${test.qs.length}</span><span>${test.practice?'Practice':'Exam'}</span></div>
+   <div class="progress"><div style="width:${test.i/test.qs.length*100}%"></div></div>
+   <div class="q card"><h2 id="qtext" tabindex="-1">${q.q}</h2>
+   <div class="opts" role="radiogroup" aria-labelledby="qtext">${q.opts.map((o,k)=>`<button class="opt" role="radio" aria-checked="${q.pick===o}" data-k="${k}">${String.fromCharCode(65+k)}. ${o}</button>`).join('')}</div>
+   <div id="fb"></div></div>
+   <div class="navrow">${test.i>0&&!test.practice?'<button class="btn ghost" id="qBack">← Back</button>':''}<button class="btn grow" id="qNext" disabled>${test.practice?'Check answer':(test.i===test.qs.length-1?'Finish':'Next →')}</button></div>`;
+  const opts=[...tb.querySelectorAll('.opt')];
+  opts.forEach((b,k)=>{ b.onclick=()=>{ if(test.checked) return; q.pick=q.opts[k]; opts.forEach(x=>x.setAttribute('aria-checked',String(x===b))); next.disabled=false; };
+    b.onkeydown=e=>{ if(['ArrowDown','ArrowRight','ArrowUp','ArrowLeft'].includes(e.key)){ e.preventDefault(); const d=(e.key==='ArrowDown'||e.key==='ArrowRight')?1:-1; const n=opts[(k+d+opts.length)%opts.length]; n.focus(); n.click(); } };
+    b.tabIndex = (q.pick? q.pick===q.opts[k] : k===0) ? 0 : -1; });
+  const next=tb.querySelector('#qNext'); next.disabled = !q.pick;
+  next.onclick=()=>{
+    if(test.practice && !test.checked){ test.checked=true; const ok=q.pick===q.a;
+      opts.forEach(b=>{ const o=q.opts[b.dataset.k]; if(o===q.a) b.classList.add('correct'); else if(o===q.pick) b.classList.add('wrong'); });
+      tb.querySelector('#fb').innerHTML=`<div class="fb ${ok?'ok':'no'}"><b>${ok?'Correct.':'Not quite.'}</b> ${ok?'':'Answer: '+q.a+'. '}Reference: ${q.ref}.</div>`;
+      announce(ok?'Correct.':'Incorrect. Correct answer: '+q.a);
+      next.textContent = test.i===test.qs.length-1?'See results':'Next question →'; return; }
+    if(test.i<test.qs.length-1){ test.i++; renderQ(); } else finishTest(); };
+  const back=tb.querySelector('#qBack'); if(back) back.onclick=()=>{test.i--;renderQ();};
+  tb.querySelector('#qtext').focus({preventScroll:true});
+}
+function finishTest(){
+  const score=test.qs.filter(q=>q.pick===q.a).length, n=test.qs.length;
+  setLayout({out:new Set(),sep:0},true); setHighlight([]); resetView();
+  tb.innerHTML=`<h2 style="font-size:18px;margin:0" id="res" tabindex="-1">Results</h2>
+   <div class="score">${score} / ${n}</div><div style="color:var(--muted);margin-bottom:10px">${Math.round(score/n*100)}% · ${test.practice?'Practice':'Exam'} mode</div>
+   <div class="navrow"><button class="btn" id="again">Take a new test</button></div>
+   <h3 style="font-size:14px;margin:16px 0 4px">Review</h3>
+   ${test.qs.map((q,i)=>{const ok=q.pick===q.a;return `<div class="rev"><b>${i+1}. ${q.part?`Identify part (${q.part}) — `:''}${q.q}</b><br>
+     ${ok?`<span class="c">✓ ${q.a}</span>`:`<span class="y">✗ Your answer: ${q.pick??'—'}</span><br><span class="c">✓ ${q.a}</span>`}
+     <br><span style="color:var(--muted)">Ref: ${q.ref}</span></div>`;}).join('')}`;
+  tb.querySelector('#again').onclick=testStart; tb.querySelector('#res').focus();
+  announce(`Test complete. Score ${score} out of ${n}.`);
+}
+
+/* =====================================================================
+   TABS, TOOLBAR, DIALOGS
+   ===================================================================== */
+const tabs=[...document.querySelectorAll('[role=tab]')];
+function setMode(m){ mode=m;
+  tabs.forEach(t=>{const on=t.id==='tab-'+m; t.setAttribute('aria-selected',on); t.tabIndex=on?0:-1; document.getElementById(t.getAttribute('aria-controls')).hidden=!on;});
+  pc.style.display='none'; tip.style.display='none';
+  document.getElementById('hint').textContent = m==='test' ? 'Drag to orbit · scroll to zoom — part names are hidden during the test' : 'Drag to orbit · scroll to zoom · right-drag to pan · click a part to identify it';
+  fixture=null; sight.visible=stream.visible=false; stepXray=false; applyLook();
+  if(m==='guide') showStep(stepIdx,false);
+  if(m==='explore'){ dimmed=new Set(); applyExplore(true); setHighlight(exploreSel?[exploreSel]:[]); resetView(true); }
+  if(m==='test'){ if(!test||test.done) testStart(); else renderQ(); }
+}
+tabs.forEach((t,i)=>{ t.onclick=()=>setMode(t.id.slice(4));
+  t.onkeydown=e=>{ if(e.key==='ArrowRight'||e.key==='ArrowLeft'){ const n=tabs[(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length]; n.focus(); n.click(); } }; });
+
+function orbit(dAz,dPol){ const off=camera.position.clone().sub(controls.target); const s=new THREE.Spherical().setFromVector3(off);
+  s.theta+=dAz; s.phi=THREE.MathUtils.clamp(s.phi+dPol,.15,Math.PI-.15); off.setFromSpherical(s); camera.position.copy(controls.target).add(off); }
+function zoom(f){ const off=camera.position.clone().sub(controls.target).multiplyScalar(f); const L=THREE.MathUtils.clamp(off.length(),controls.minDistance,controls.maxDistance); camera.position.copy(controls.target).add(off.setLength(L)); }
+const $=id=>document.getElementById(id);
+$('vLeft').onclick=()=>orbit(-.35,0); $('vRight').onclick=()=>orbit(.35,0);
+$('vUp').onclick=()=>orbit(0,-.2); $('vDown').onclick=()=>orbit(0,.2);
+$('vIn').onclick=()=>zoom(.8); $('vOut').onclick=()=>zoom(1.25); $('vReset').onclick=()=>resetView(mode==='explore');
+const toggle=(id,fn)=>{ const b=$(id); b.onclick=()=>{ const v=b.getAttribute('aria-pressed')!=='true'; b.setAttribute('aria-pressed',v); fn(v); }; };
+toggle('vXray',v=>{xray=v;applyLook();});
+toggle('vLabels',v=>{showLabels=v;buildLabels();});
+toggle('vFocus',v=>{autoFocus=v;});
+
+const dlg=$('dlg');
+function openDlg(title,html){ $('dlgTitle').textContent=title; $('dlgBody').innerHTML=html; dlg.showModal(); }
+$('dlgClose').onclick=()=>dlg.close();
+$('btnTorque').onclick=()=>openDlg('Table II — Torque settings, MA-3 and MA-4SPA',tableHTML(['Item','Torque'],TORQUE)+
+  `<p style="font-size:13px;color:var(--muted)">Note: step 40 text gives 20–28 in-lb for the mixture control clamp screw; Table II lists 15–20 in-lb for the mixture control lever screw.</p>`);
+$('btnTools').onclick=()=>openDlg('Special tools',tableHTML(['Part no.','Tool'],TOOLS));
+$('btnHelp').onclick=()=>openDlg('How to use this guide',`<ul style="padding-left:18px;margin:0">
+ <li><b>Guide</b> walks through the manual from disassembly to test, in order. Each step animates the parts being removed or installed and highlights them in orange. Use <b>Next / Previous</b> or the <b>← →</b> keys; jump to a section with the chips at the top.</li>
+ <li>Removed parts stay laid out around the carburetor (faded) so you can see where everything went.</li>
+ <li><b>Explore parts</b> lets you explode the whole assembly with the slider and look up any part by number: removal and install step, torque, wear limit, and whether it is always replaced.</li>
+ <li><b>Test</b> gives 25 questions drawn at random. Practice mode shows feedback after each question; Exam mode scores at the end.</li>
+ <li>Mouse: drag to orbit, scroll to zoom, right-drag to pan, click a part to identify it. Keyboard: Tab to every control; the view buttons rotate, tilt and zoom.</li>
+ <li><b>X-ray castings</b> makes the throttle body and bowl see-through so you can watch the float, pump and mixture valve inside.</li></ul>
+ <p style="font-size:13px;color:var(--muted)">Source: Precision Airmotive Corp. Aircraft Carburetor Service Manual FSM-OH1 (March 30, 1993). Always work from the current manual and applicable service bulletins.</p>`);
+
+const live=$('live'); function announce(t){ live.textContent=''; setTimeout(()=>live.textContent=t,30); }
+
+/* start */
+resize();
+let saved=0; try{saved=+localStorage.getItem('carbStep')||0;}catch(e){}
+showStep(Math.min(saved,STEPS.length-1),false);
+</script>
+</body>
+</html>
